@@ -82,85 +82,132 @@ export default function PostDetail() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Post Header */}
-      <article>
-        <header className="mb-8">
-          {/* Cover Image */}
-          {post.coverImage && (
-            <img
-              src={post.coverImage}
-              alt={post.title}
-              className="w-full h-96 object-cover rounded-lg shadow-lg mb-6"
-              onError={(e) => {
-                e.target.style.display = 'none';
-              }}
-            />
-          )}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Post Header */}
+        <article>
+          <header className="mb-12">
+            {/* Cover Image with Parallax Effect */}
+            {post.coverImage && (
+              <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mb-8 overflow-hidden rounded-2xl shadow-2xl">
+                <img
+                  src={post.coverImage}
+                  alt={post.title}
+                  className="w-full h-[500px] object-cover"
+                  onError={(e) => {
+                    e.target.parentElement.style.display = 'none';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                
+                {/* Title Overlay on Image */}
+                <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                  <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">
+                    {post.title}
+                  </h1>
+                </div>
+              </div>
+            )}
 
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {post.title}
-          </h1>
+            {/* Title if no cover image */}
+            {!post.coverImage && (
+              <h1 className="text-5xl font-bold text-gray-900 mb-6">
+                {post.title}
+              </h1>
+            )}
 
-          {/* Meta info */}
-          <div className="flex items-center space-x-6 text-gray-600 mb-4">
-            <span className="flex items-center">
-              👤 {post.author?.displayName}
-            </span>
-            <span>⏱️ {post.readingTime} min read</span>
-            <span>👁️ {post.views} views</span>
-            <button
-              onClick={handleLike}
-              className="flex items-center hover:text-red-500 transition"
-            >
-              ❤️ {post.likes}
-            </button>
-          </div>
+            {/* Author Card */}
+            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                    {post.author?.displayName?.charAt(0) || 'A'}
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-900">
+                      {post.author?.displayName}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-6 text-sm">
+                  <span className="flex items-center space-x-2 text-gray-600">
+                    <span>⏱️</span>
+                    <span className="font-medium">{post.readingTime} min read</span>
+                  </span>
+                  <span className="flex items-center space-x-2 text-gray-600">
+                    <span>👁️</span>
+                    <span className="font-medium">{post.views} views</span>
+                  </span>
+                  <button
+                    onClick={handleLike}
+                    className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-red-50 to-pink-50 hover:from-red-100 hover:to-pink-100 rounded-full transition-all duration-200 transform hover:scale-105"
+                  >
+                    <span className="text-red-500">❤️</span>
+                    <span className="font-bold text-red-600">{post.likes}</span>
+                  </button>
+                </div>
+              </div>
 
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 text-sm font-medium text-primary-700 bg-primary-50 rounded-full"
-                >
-                  #{tag}
-                </span>
-              ))}
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
+                  {post.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-4 py-2 text-sm font-semibold text-primary-700 bg-gradient-to-r from-primary-50 to-purple-50 rounded-full border border-primary-200 hover:border-primary-300 transition-all hover:shadow-md"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </header>
+          </header>
 
         {/* Post Content - HTML từ server (đã qua Decorator Pipeline) */}
         <div
-          className="prose prose-lg max-w-none
-            prose-headings:font-bold
-            prose-h1:text-3xl prose-h1:mb-4
-            prose-h2:text-2xl prose-h2:mb-3
-            prose-h3:text-xl prose-h3:mb-2
-            prose-p:mb-4 prose-p:leading-relaxed
-            prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline
-            prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-            prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg
-            prose-img:rounded-lg prose-img:shadow-lg
-            prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:pl-4
-            prose-ul:list-disc prose-ol:list-decimal"
+          className="prose prose-lg max-w-none bg-white rounded-xl shadow-lg p-8 mb-12
+            prose-headings:font-bold prose-headings:text-gray-900
+            prose-h1:text-4xl prose-h1:mb-6 prose-h1:pb-4 prose-h1:border-b prose-h1:border-gray-200
+            prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-8
+            prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-6
+            prose-p:mb-4 prose-p:leading-relaxed prose-p:text-gray-700
+            prose-a:text-primary-600 prose-a:no-underline prose-a:font-medium hover:prose-a:underline hover:prose-a:text-primary-700
+            prose-code:bg-primary-50 prose-code:text-primary-800 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-semibold
+            prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-6 prose-pre:rounded-xl prose-pre:shadow-xl prose-pre:overflow-x-auto
+            prose-img:rounded-xl prose-img:shadow-2xl prose-img:my-8
+            prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:bg-primary-50 prose-blockquote:py-4 prose-blockquote:rounded-r-lg
+            prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-2
+            prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
+            prose-li:text-gray-700 prose-li:leading-relaxed
+            prose-strong:text-gray-900 prose-strong:font-bold
+            prose-em:text-gray-800"
           dangerouslySetInnerHTML={{ __html: post.contentHTML }}
         />
       </article>
 
       {/* Comments Section */}
-      <section className="mt-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          💬 Comments ({comments.length})
+      <section className="mt-16 bg-white rounded-xl shadow-lg p-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8 flex items-center space-x-3">
+          <span className="text-4xl">💬</span>
+          <span>Comments ({comments.length})</span>
         </h2>
 
         {/* Comment Form */}
-        <form onSubmit={handleCommentSubmit} className="mb-8 bg-gray-50 p-6 rounded-lg">
+        <form onSubmit={handleCommentSubmit} className="mb-10 bg-gradient-to-br from-gray-50 to-primary-50 p-6 rounded-xl border-2 border-primary-100">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Leave a comment</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Leave a comment</h3>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Your Name
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Your Name *
             </label>
             <input
               type="text"
@@ -168,14 +215,15 @@ export default function PostDetail() {
               onChange={(e) =>
                 setCommentForm({ ...commentForm, authorName: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               placeholder="John Doe"
+              required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Comment
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Comment *
             </label>
             <textarea
               value={commentForm.content}
@@ -183,36 +231,54 @@ export default function PostDetail() {
                 setCommentForm({ ...commentForm, content: e.target.value })
               }
               rows="4"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
               placeholder="Share your thoughts..."
+              required
             />
           </div>
 
           <button
             type="submit"
-            className="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+            className="px-8 py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-bold rounded-lg hover:from-primary-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            Post Comment
+            Post Comment ✨
           </button>
         </form>
 
         {/* Comments List */}
         <div className="space-y-4">
+          {comments.length === 0 && (
+            <p className="text-center text-gray-500 py-8">
+              No comments yet. Be the first to comment! 💭
+            </p>
+          )}
           {comments.map((comment) => (
-            <div key={comment._id} className="bg-white p-4 rounded-lg border border-gray-200">
-              <div className="flex items-center space-x-2 mb-2">
-                <span className="font-semibold text-gray-900">
-                  {comment.authorName}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {new Date(comment.createdAt).toLocaleDateString()}
-                </span>
+            <div key={comment._id} className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                  {comment.authorName?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <span className="font-bold text-gray-900 block">
+                    {comment.authorName}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
               </div>
-              <p className="text-gray-700">{comment.content}</p>
+              <p className="text-gray-700 leading-relaxed pl-13">{comment.content}</p>
             </div>
           ))}
         </div>
       </section>
+      </div>
     </div>
   );
 }
