@@ -8,6 +8,7 @@ import Header from './components/Header.jsx';
 import Home from './pages/Home.jsx';
 import PostDetail from './pages/PostDetail.jsx';
 import Editor from './pages/Editor.jsx';
+import MyPosts from './pages/MyPosts.jsx';
 import AdminPosts from './pages/AdminPosts.jsx';
 import Login from './pages/Login.jsx';
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/post/:slug" element={<PostDetail />} />
             <Route path="/editor" element={<Editor />} />
             <Route path="/editor/:id" element={<Editor />} />
+            <Route path="/my-posts" element={<MyPosts />} />
             <Route path="/admin" element={<AdminPosts />} />
             <Route path="/login" element={<Login />} />
           </Routes>

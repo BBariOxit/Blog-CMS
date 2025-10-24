@@ -10,23 +10,37 @@ import hljs from 'highlight.js';
 // Import highlight.js theme
 import 'highlight.js/styles/github-dark.css';
 
-export default function MarkdownPreview({ markdown }) {
+export default function MarkdownPreview({ markdown, content }) {
+  // Accept either `markdown` or legacy `content` prop
+  const md = markdown ?? content ?? '';
+
   useEffect(() => {
     // Highlight code blocks after render
-    document.querySelectorAll('pre code').forEach((block) => {
-      hljs.highlightElement(block);
-    });
-  }, [markdown]);
+    try {
+      document.querySelectorAll('pre code').forEach((block) => {
+        try { hljs.highlightElement(block); } catch (e) { /* ignore */ }
+      });
+    } catch (e) {
+      // Defensive: in rare cases document may be unavailable
+      // swallow to avoid crashing the entire app
+      // console.warn('Highlight failed', e);
+    }
+  }, [md]);
 
   const getHTML = () => {
-    if (!markdown) return '';
+    if (!md) return '';
 
     marked.setOptions({
       breaks: true,
       gfm: true,
     });
 
-    return marked.parse(markdown);
+    try {
+      return marked.parse(md);
+    } catch (e) {
+      // If marked parsing fails, return escaped text
+      return md.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
   };
 
   return (

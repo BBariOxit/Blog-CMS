@@ -21,6 +21,7 @@ export const getPosts = async (req, res, next) => {
       q, // Search query
       tag, // Filter by tag
       status, // Filter by status (draft/published)
+      author, // Filter by author ID
       page = 1,
       limit = 10,
     } = req.query;
@@ -37,11 +38,16 @@ export const getPosts = async (req, res, next) => {
       query.tags = tag;
     }
 
+    // Filter by author
+    if (author) {
+      query.author = author;
+    }
+
     // Filter by status
     if (status) {
       query.status = status;
-    } else {
-      // Default: chỉ hiển thị published posts nếu không có filter
+    } else if (!author) {
+      // Default: chỉ hiển thị published posts nếu không có filter và không filter theo author
       query.status = 'published';
     }
 
@@ -102,13 +108,16 @@ export const getPostBySlug = async (req, res, next) => {
  */
 export const createPost = async (req, res, next) => {
   try {
-    const { title, contentMarkdown, tags, coverImage } = req.body;
+    const { title, contentMarkdown, tags, coverImage, status } = req.body;
 
     if (!title || !contentMarkdown) {
       return res.status(400).json({
         message: 'Title và contentMarkdown là bắt buộc',
       });
     }
+
+    // Validate status
+    const postStatus = status === 'published' ? 'published' : 'draft';
 
     // Tạo slug
     const baseSlug = slugify(title);
@@ -132,7 +141,8 @@ export const createPost = async (req, res, next) => {
       readingTime: processedContent.readingTime,
       tags: Array.isArray(tags) ? tags : [],
       coverImage: coverImage || '',
-      status: 'draft', // Mặc định là draft
+      status: postStatus,
+      publishedAt: postStatus === 'published' ? new Date() : null,
     });
 
     await post.populate('author', 'displayName email');

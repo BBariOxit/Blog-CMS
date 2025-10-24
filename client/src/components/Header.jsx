@@ -50,7 +50,7 @@ export default function Header() {
                   ✏️ New Post
                 </Link>
                 <Link
-                  to="/admin"
+                  to="/my-posts"
                   className="text-gray-700 hover:text-primary-600 transition font-medium"
                 >
                   📚 My Posts
