@@ -87,12 +87,16 @@ export default function AdminPosts() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Posts</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">📚 My Posts</h1>
+          <p className="text-gray-600 mt-2">Manage your blog posts</p>
+        </div>
         <Link
           to="/editor"
-          className="px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition"
+          className="px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition flex items-center space-x-2"
         >
-          + New Post
+          <span>✏️</span>
+          <span>New Post</span>
         </Link>
       </div>
 

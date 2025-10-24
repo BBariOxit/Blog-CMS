@@ -14,9 +14,9 @@ import Login from './pages/Login.jsx';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <Header />
-        <main>
+        <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/post/:slug" element={<PostDetail />} />
@@ -26,10 +26,10 @@ function App() {
             <Route path="/login" element={<Login />} />
           </Routes>
         </main>
-        <footer className="bg-white border-t border-gray-200 mt-16">
+        <footer className="bg-white border-t border-gray-200 mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <p className="text-center text-gray-600">
-              © 2024 PaperPress - Built with{' '}
+              © 2025 PaperPress - Built with{' '}
               <span className="text-red-500">❤️</span> using React, Node.js &
               Design Patterns
             </p>

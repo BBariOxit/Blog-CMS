@@ -27,6 +27,10 @@ const postSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    coverImage: {
+      type: String,
+      default: '',
+    },
     status: {
       type: String,
       enum: ['draft', 'published'],

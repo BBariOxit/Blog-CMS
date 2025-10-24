@@ -8,6 +8,20 @@ import { Link } from 'react-router-dom';
 export default function PostCard({ post }) {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+      {/* Cover Image */}
+      {post.coverImage && (
+        <Link to={`/post/${post.slug}`}>
+          <img
+            src={post.coverImage}
+            alt={post.title}
+            className="w-full h-48 object-cover hover:opacity-90 transition-opacity"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        </Link>
+      )}
+
       <div className="p-6">
         {/* Title */}
         <Link to={`/post/${post.slug}`}>

@@ -102,7 +102,7 @@ export const getPostBySlug = async (req, res, next) => {
  */
 export const createPost = async (req, res, next) => {
   try {
-    const { title, contentMarkdown, tags } = req.body;
+    const { title, contentMarkdown, tags, coverImage } = req.body;
 
     if (!title || !contentMarkdown) {
       return res.status(400).json({
@@ -131,6 +131,7 @@ export const createPost = async (req, res, next) => {
       contentHTML: processedContent.contentHTML,
       readingTime: processedContent.readingTime,
       tags: Array.isArray(tags) ? tags : [],
+      coverImage: coverImage || '',
       status: 'draft', // Mặc định là draft
     });
 
@@ -149,7 +150,7 @@ export const createPost = async (req, res, next) => {
 export const updatePost = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, contentMarkdown, tags } = req.body;
+    const { title, contentMarkdown, tags, coverImage } = req.body;
 
     const post = await Post.findById(id);
 
@@ -195,6 +196,11 @@ export const updatePost = async (req, res, next) => {
     // Cập nhật tags
     if (tags) {
       post.tags = Array.isArray(tags) ? tags : [];
+    }
+
+    // Cập nhật coverImage
+    if (coverImage !== undefined) {
+      post.coverImage = coverImage;
     }
 
     await post.save();

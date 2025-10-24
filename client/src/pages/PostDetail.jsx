@@ -86,6 +86,18 @@ export default function PostDetail() {
       {/* Post Header */}
       <article>
         <header className="mb-8">
+          {/* Cover Image */}
+          {post.coverImage && (
+            <img
+              src={post.coverImage}
+              alt={post.title}
+              className="w-full h-96 object-cover rounded-lg shadow-lg mb-6"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          )}
+
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             {post.title}
           </h1>

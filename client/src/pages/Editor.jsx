@@ -18,9 +18,74 @@ export default function Editor() {
     title: '',
     contentMarkdown: '',
     tags: '',
+    coverImage: '',
   });
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const blogTemplates = {
+    tutorial: `# Tutorial Title
+
+## Introduction
+Briefly introduce what readers will learn in this tutorial.
+
+## Prerequisites
+- Requirement 1
+- Requirement 2
+
+## Step 1: Setup
+Explain the first step...
+
+\`\`\`javascript
+const example = "code here";
+console.log(example);
+\`\`\`
+
+## Step 2: Implementation
+Continue with implementation details...
+
+## Conclusion
+Summarize what was learned.`,
+    
+    review: `# Product/Service Review
+
+## Overview
+Quick summary of what you're reviewing...
+
+## Pros
+- Advantage 1
+- Advantage 2
+- Advantage 3
+
+## Cons
+- Disadvantage 1
+- Disadvantage 2
+
+## Final Verdict
+⭐⭐⭐⭐⭐ (5/5)
+
+My overall thoughts...`,
+    
+    story: `# Story Title
+
+Once upon a time...
+
+## Chapter 1
+Your story begins here...
+
+## Chapter 2
+The plot thickens...
+
+## Conclusion
+How does it end?`
+  };
+
+  const loadTemplate = (templateKey) => {
+    if (formData.contentMarkdown && !confirm('This will replace your current content. Continue?')) {
+      return;
+    }
+    setFormData({ ...formData, contentMarkdown: blogTemplates[templateKey] });
+  };
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
@@ -63,6 +128,7 @@ export default function Editor() {
         title: formData.title,
         contentMarkdown: formData.contentMarkdown,
         tags: tagsArray,
+        coverImage: formData.coverImage,
       };
 
       if (id) {
@@ -84,7 +150,7 @@ export default function Editor() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          {id ? 'Edit Post' : 'Create New Post'}
+          {id ? '✏️ Edit Post' : '✨ Create New Post'}
         </h1>
         <p className="text-gray-600 mt-2">
           Write your post in Markdown. It will be processed through our{' '}
@@ -94,6 +160,41 @@ export default function Editor() {
           (Markdown → Sanitize → Highlight → ReadingTime).
         </p>
       </div>
+
+      {/* Template Selector - Only for new posts */}
+      {!id && !formData.contentMarkdown && (
+        <div className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            🚀 Quick Start with a Template
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              onClick={() => loadTemplate('tutorial')}
+              className="p-4 bg-white rounded-lg border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition text-left"
+            >
+              <div className="text-2xl mb-2">📚</div>
+              <div className="font-semibold text-gray-900">Tutorial</div>
+              <div className="text-sm text-gray-600">Step-by-step guide</div>
+            </button>
+            <button
+              onClick={() => loadTemplate('review')}
+              className="p-4 bg-white rounded-lg border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition text-left"
+            >
+              <div className="text-2xl mb-2">⭐</div>
+              <div className="font-semibold text-gray-900">Review</div>
+              <div className="text-sm text-gray-600">Product/service review</div>
+            </button>
+            <button
+              onClick={() => loadTemplate('story')}
+              className="p-4 bg-white rounded-lg border-2 border-pink-200 hover:border-pink-400 hover:shadow-md transition text-left"
+            >
+              <div className="text-2xl mb-2">📖</div>
+              <div className="font-semibold text-gray-900">Story</div>
+              <div className="text-sm text-gray-600">Creative writing</div>
+            </button>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -130,6 +231,37 @@ export default function Editor() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="react, javascript, tutorial"
               />
+            </div>
+
+            {/* Cover Image */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                🖼️ Cover Image URL
+              </label>
+              <input
+                type="url"
+                value={formData.coverImage}
+                onChange={(e) =>
+                  setFormData({ ...formData, coverImage: e.target.value })
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="https://images.unsplash.com/photo-..."
+              />
+              {formData.coverImage && (
+                <div className="mt-2">
+                  <img 
+                    src={formData.coverImage} 
+                    alt="Cover preview" 
+                    className="w-full h-40 object-cover rounded-lg"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Recommended: 800x400px or 2:1 ratio
+              </p>
             </div>
 
             {/* Content Markdown */}

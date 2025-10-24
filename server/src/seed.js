@@ -13,6 +13,7 @@ import { slugify } from './utils/slugify.js';
 const samplePosts = [
   {
     title: 'Getting Started with React 18',
+    coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=400&fit=crop',
     contentMarkdown: `# Getting Started with React 18
 
 React 18 brings exciting new features like **concurrent rendering** and **automatic batching**.
@@ -56,6 +57,7 @@ Happy coding! 🚀`,
   },
   {
     title: 'MongoDB Design Patterns',
+    coverImage: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&h=400&fit=crop',
     contentMarkdown: `# MongoDB Design Patterns
 
 Explore essential **design patterns** for MongoDB applications.
@@ -92,6 +94,7 @@ Performance is key! ⚡`,
   },
   {
     title: 'Node.js Best Practices 2024',
+    coverImage: 'https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&h=400&fit=crop',
     contentMarkdown: `# Node.js Best Practices 2024
 
 Modern Node.js development requires following **best practices** for maintainable code.
@@ -129,6 +132,7 @@ Stay secure! 🔒`,
   },
   {
     title: 'Understanding Decorator Pattern',
+    coverImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop',
     contentMarkdown: `# Understanding Decorator Pattern
 
 The **Decorator Pattern** allows you to add new functionality to objects dynamically.
@@ -161,6 +165,7 @@ Flexible and powerful! 💪`,
   },
   {
     title: 'Strategy Pattern in Action',
+    coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop',
     contentMarkdown: `# Strategy Pattern in Action
 
 The **Strategy Pattern** defines a family of algorithms and makes them interchangeable.
@@ -202,6 +207,7 @@ Clean and maintainable! ✨`,
   },
   {
     title: 'Express.js Middleware Deep Dive',
+    coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop',
     contentMarkdown: `# Express.js Middleware Deep Dive
 
 Understanding **middleware** is crucial for Express.js mastery.
@@ -234,6 +240,7 @@ Power up your Express apps! 🔥`,
   },
   {
     title: 'CSS Grid vs Flexbox',
+    coverImage: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&h=400&fit=crop',
     contentMarkdown: `# CSS Grid vs Flexbox
 
 Choose the right tool for your **layout needs**.
@@ -266,6 +273,7 @@ Master both! 🎨`,
   },
   {
     title: 'Async/Await Best Practices',
+    coverImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop',
     contentMarkdown: `# Async/Await Best Practices
 
 Write **clean asynchronous code** with these tips.

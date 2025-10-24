@@ -36,24 +36,24 @@ export default function Header() {
           <nav className="flex items-center space-x-6">
             <Link
               to="/"
-              className="text-gray-700 hover:text-primary-600 transition"
+              className="text-gray-700 hover:text-primary-600 transition font-medium"
             >
-              Home
+              🏠 Home
             </Link>
 
             {auth.isAuthenticated && (
               <>
                 <Link
                   to="/editor"
-                  className="text-gray-700 hover:text-primary-600 transition"
+                  className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition"
                 >
-                  New Post
+                  ✏️ New Post
                 </Link>
                 <Link
                   to="/admin"
-                  className="text-gray-700 hover:text-primary-600 transition"
+                  className="text-gray-700 hover:text-primary-600 transition font-medium"
                 >
-                  My Posts
+                  📚 My Posts
                 </Link>
               </>
             )}
