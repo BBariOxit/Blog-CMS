@@ -335,6 +335,9 @@ async function seed() {
       passwordHash: authorPassword,
       displayName: 'John Author',
       role: 'author',
+      bio: 'Passionate writer and tech enthusiast. Love sharing knowledge about web development.',
+      isActive: true,
+      lastLogin: new Date(),
     });
 
     const editor = await User.create({
@@ -342,6 +345,9 @@ async function seed() {
       passwordHash: editorPassword,
       displayName: 'Jane Editor',
       role: 'editor',
+      bio: 'Professional editor with 5+ years of experience in technical writing and content management.',
+      isActive: true,
+      lastLogin: new Date(),
     });
 
     console.log(`✅ Created users: ${author.email}, ${editor.email}\n`);

@@ -42,38 +42,64 @@ class AuthStore {
 
   async login(email, password) {
     try {
-      const data = await authAPI.login({ email, password });
-      this.token = data.token;
-      this.user = data.user;
+      const response = await authAPI.login({ email, password });
+      
+      // Server trả về { message, token, user }
+      const { token, user } = response;
+      
+      if (!token || !user) {
+        console.error('Invalid response from server:', response);
+        return {
+          success: false,
+          error: 'Invalid server response. Please try again.',
+        };
+      }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      this.token = token;
+      this.user = user;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
 
       this.notify();
-      return { success: true, user: data.user };
+      return { success: true, user: user };
     } catch (error) {
+      console.error('Login error:', error);
       return {
         success: false,
-        error: error.response?.data?.message || 'Login failed',
+        error: error.response?.data?.message || error.message || 'Login failed. Please try again.',
       };
     }
   }
 
   async register(email, password, displayName) {
     try {
-      const data = await authAPI.register({ email, password, displayName });
-      this.token = data.token;
-      this.user = data.user;
+      const response = await authAPI.register({ email, password, displayName });
+      
+      // Server trả về { message, token, user }
+      const { token, user } = response;
+      
+      if (!token || !user) {
+        console.error('Invalid response from server:', response);
+        return {
+          success: false,
+          error: 'Invalid server response. Please try again.',
+        };
+      }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      this.token = token;
+      this.user = user;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
 
       this.notify();
-      return { success: true, user: data.user };
+      return { success: true, user: user };
     } catch (error) {
+      console.error('Register error:', error);
       return {
         success: false,
-        error: error.response?.data?.message || 'Registration failed',
+        error: error.response?.data?.message || error.message || 'Registration failed. Please try again.',
       };
     }
   }
