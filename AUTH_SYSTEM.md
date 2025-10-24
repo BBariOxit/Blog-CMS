@@ -1,6 +1,7 @@
 # 🔐 Authentication System - Professional Implementation
 
 ## Tổng quan
+
 Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy đủ, security tốt, và UX tuyệt vời.
 
 ---
@@ -10,6 +11,7 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 ### 1. **User Model** (`server/src/models/User.js`)
 
 #### Schema Fields
+
 ```javascript
 {
   email: {
@@ -46,11 +48,13 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 ```
 
 #### Methods & Statics
+
 ✅ **comparePassword(password)** - So sánh password với hash (bcrypt)
 ✅ **hashPassword(password)** - Static method để hash password
-✅ **toJSON()** - Ẩn passwordHash và __v khi trả về client
+✅ **toJSON()** - Ẩn passwordHash và \_\_v khi trả về client
 
 #### Security Features
+
 - Password hashing với bcrypt (10 rounds)
 - Email validation với regex
 - Unique constraint trên email
@@ -62,21 +66,25 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 ### 2. **Auth Controller** (`server/src/controllers/auth.controller.js`)
 
 #### Register Endpoint
+
 **POST /api/auth/register**
 
 ✅ **Validation**:
+
 - Email format (regex)
 - Password strength (min 6 characters)
 - Display name length (min 2 characters)
 - All fields required
 
 ✅ **Security**:
+
 - Check email already exists (409 Conflict)
 - Hash password trước khi lưu
 - Email lowercase để tránh duplicate
 - Trim displayName
 
 ✅ **Response**:
+
 ```json
 {
   "message": "Account created successfully",
@@ -93,20 +101,24 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 ```
 
 #### Login Endpoint
+
 **POST /api/auth/login**
 
 ✅ **Validation**:
+
 - Email format
 - Password required
 - Case-insensitive email lookup
 
 ✅ **Security**:
+
 - Generic error message (không tiết lộ email/password sai)
 - Check account isActive
 - Update lastLogin timestamp
 - JWT token với expiry 7 days
 
 ✅ **Response**:
+
 ```json
 {
   "message": "Login successful",
@@ -116,6 +128,7 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 ```
 
 #### Get Current User
+
 **GET /api/auth/me** (Protected)
 
 ✅ Trả về thông tin user hiện tại
@@ -126,10 +139,12 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 ### 3. **Auth Middleware** (`server/src/middlewares/auth.js`)
 
 #### authenticate
+
 ✅ **Verify JWT token** từ header Authorization
 ✅ **Check user exists** và active
 ✅ **Attach user** to req.user, req.userId, req.userRole
 ✅ **Error codes**:
+
 - AUTH_TOKEN_MISSING
 - USER_NOT_FOUND
 - ACCOUNT_DEACTIVATED
@@ -138,11 +153,13 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 - AUTH_ERROR
 
 #### requireRole(allowedRoles)
+
 ✅ Check user có role được phép
 ✅ Return 403 nếu không đủ quyền
 ✅ Thông báo role required
 
 #### optionalAuth (New!)
+
 ✅ Không bắt buộc login
 ✅ Nếu có token hợp lệ → attach user
 ✅ Nếu không có token → next luôn (không error)
@@ -155,6 +172,7 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 ### 1. **Login Page** (`client/src/pages/Login.jsx`)
 
 #### UI Features
+
 ✅ **Dual Mode**: Toggle Login ↔ Sign Up
 ✅ **Gradient Background**: from-primary-50 via-white to-purple-50
 ✅ **Icon Header**: Lock icon với gradient
@@ -163,6 +181,7 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 #### Form Fields
 
 **Email Input**:
+
 - Icon: @ symbol
 - Placeholder: "your@email.com"
 - Type: email
@@ -170,12 +189,14 @@ Hệ thống đăng nhập/đăng ký chuyên nghiệp với validation đầy �
 - Error message: Inline với icon ⚠️
 
 **Display Name** (Sign Up only):
+
 - Icon: User profile
 - Placeholder: "John Doe"
 - Min 2 characters
 - Animation: fadeIn khi xuất hiện
 
 **Password Input**:
+
 - Icon: Lock
 - Toggle show/hide password (eye icon)
 - Placeholder: "••••••••"
@@ -203,11 +224,13 @@ validateDisplayName(name) {
 ✅ **Server error handling** - Hiển thị lỗi từ server
 
 #### Error Display
+
 ✅ **General errors**: Alert box gradient màu đỏ, shake animation
 ✅ **Field errors**: Inline dưới input với icon
 ✅ **Border colors**: Red khi error, blue khi focus
 
 #### Submit Button
+
 ✅ **Gradient**: primary-600 → purple-600
 ✅ **Loading state**: Spinner animation
 ✅ **Disabled state**: opacity-50, no pointer
@@ -215,22 +238,44 @@ validateDisplayName(name) {
 ✅ **Active state**: scale-98
 
 #### Quick Login (Demo Accounts)
+
 ✅ **Author button**: Blue gradient với avatar "A"
 ✅ **Editor button**: Purple gradient với avatar "E"
 ✅ **Auto-fill**: Click để fill email + password
 ✅ **Grid layout**: 2 columns responsive
 
 #### Animations
+
 ```css
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
 }
 ```
 
@@ -239,6 +284,7 @@ validateDisplayName(name) {
 ## 🔒 Security Features
 
 ### Backend
+
 1. ✅ **Password Hashing**: bcrypt với 10 rounds
 2. ✅ **JWT Tokens**: 7 days expiry, signed với secret
 3. ✅ **Email Uniqueness**: Database constraint
@@ -251,6 +297,7 @@ validateDisplayName(name) {
 10. ✅ **Role-based Access**: Middleware requireRole
 
 ### Frontend
+
 1. ✅ **Client Validation**: Prevent invalid submissions
 2. ✅ **Password Toggle**: Show/hide password
 3. ✅ **HTTPS Ready**: Production environment
@@ -262,6 +309,7 @@ validateDisplayName(name) {
 ## 📊 User Flow
 
 ### Sign Up Flow
+
 1. User fills: Email, Display Name, Password
 2. Client validates format
 3. Submit → POST /api/auth/register
@@ -278,6 +326,7 @@ validateDisplayName(name) {
 10. Redirect to home
 
 ### Login Flow
+
 1. User fills: Email, Password
 2. Client validates format
 3. Submit → POST /api/auth/login
@@ -293,6 +342,7 @@ validateDisplayName(name) {
 9. Redirect to home
 
 ### Protected Route Access
+
 1. Client adds: `Authorization: Bearer TOKEN`
 2. Middleware extracts token
 3. Verify JWT signature
@@ -307,6 +357,7 @@ validateDisplayName(name) {
 ## 🎯 Error Handling
 
 ### HTTP Status Codes
+
 - **200**: Success (login)
 - **201**: Created (register)
 - **400**: Bad Request (validation error)
@@ -316,6 +367,7 @@ validateDisplayName(name) {
 - **500**: Server Error
 
 ### Error Response Format
+
 ```json
 {
   "message": "Human-readable error message",
@@ -325,6 +377,7 @@ validateDisplayName(name) {
 ```
 
 ### Error Codes
+
 - `AUTH_TOKEN_MISSING`: No token provided
 - `USER_NOT_FOUND`: User doesn't exist
 - `ACCOUNT_DEACTIVATED`: Account disabled
@@ -338,6 +391,7 @@ validateDisplayName(name) {
 ## 🧪 Testing
 
 ### Test Accounts
+
 ```
 Author: author@example.com / password
 Editor: editor@example.com / password
@@ -346,6 +400,7 @@ Editor: editor@example.com / password
 ### Manual Test Scenarios
 
 #### ✅ Register New Account
+
 1. Click "Sign up for free"
 2. Fill: test@example.com, Test User, password123
 3. Submit
@@ -353,29 +408,34 @@ Editor: editor@example.com / password
 5. Check token saved in localStorage
 
 #### ✅ Login Existing Account
+
 1. Fill: author@example.com, password
 2. Submit
 3. Should login và redirect home
 4. Check user info in authStore
 
 #### ✅ Quick Login
+
 1. Click "Author" button
 2. Form auto-fills
 3. Click "Login to Dashboard"
 4. Should login successfully
 
 #### ✅ Validation Errors
+
 1. Submit empty form → All fields required
 2. Email: "invalid" → Invalid email format
 3. Password: "123" → Min 6 characters
 4. Display name: "a" → Min 2 characters
 
 #### ✅ Server Errors
+
 1. Register với existing email → Email already registered
 2. Login với wrong password → Invalid credentials
 3. Login với deactivated account → Account deactivated
 
 #### ✅ Token Expiry
+
 1. Login
 2. Wait 7 days (or modify JWT expiry to 1 minute)
 3. Make authenticated request
@@ -387,17 +447,20 @@ Editor: editor@example.com / password
 ## 📱 Responsive Design
 
 ### Mobile (< 768px)
+
 - Full width form
 - Stacked quick login buttons
 - Larger touch targets (min 44x44px)
 - Adjusted spacing
 
 ### Tablet (768px - 1024px)
+
 - Centered card (max-w-md)
 - 2-column quick login grid
 - Medium spacing
 
 ### Desktop (> 1024px)
+
 - Centered card
 - 2-column quick login grid
 - Full spacing
@@ -408,12 +471,14 @@ Editor: editor@example.com / password
 ## 🚀 Performance
 
 ### Backend
+
 - ✅ Email index cho fast lookup
 - ✅ select: false giảm data transfer
 - ✅ JWT stateless (no session storage)
 - ✅ Bcrypt optimized (10 rounds balance)
 
 ### Frontend
+
 - ✅ Form validation trước khi submit
 - ✅ Debounce real-time validation (có thể add)
 - ✅ Lazy load authStore
@@ -424,6 +489,7 @@ Editor: editor@example.com / password
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```env
 # Server
 PORT=4001
@@ -435,6 +501,7 @@ VITE_API_URL=http://localhost:4001/api
 ```
 
 ### JWT Configuration
+
 ```javascript
 {
   expiresIn: '7d',        // Token validity
@@ -452,7 +519,9 @@ VITE_API_URL=http://localhost:4001/api
 ## 📝 API Documentation
 
 ### POST /api/auth/register
+
 **Request**:
+
 ```json
 {
   "email": "user@example.com",
@@ -462,6 +531,7 @@ VITE_API_URL=http://localhost:4001/api
 ```
 
 **Success Response (201)**:
+
 ```json
 {
   "message": "Account created successfully",
@@ -478,11 +548,14 @@ VITE_API_URL=http://localhost:4001/api
 ```
 
 **Error Responses**:
+
 - 400: Validation error
 - 409: Email already exists
 
 ### POST /api/auth/login
+
 **Request**:
+
 ```json
 {
   "email": "user@example.com",
@@ -491,6 +564,7 @@ VITE_API_URL=http://localhost:4001/api
 ```
 
 **Success Response (200)**:
+
 ```json
 {
   "message": "Login successful",
@@ -500,17 +574,21 @@ VITE_API_URL=http://localhost:4001/api
 ```
 
 **Error Responses**:
+
 - 400: Validation error
 - 401: Invalid credentials
 - 403: Account deactivated
 
 ### GET /api/auth/me
+
 **Headers**:
+
 ```
 Authorization: Bearer eyJhbGc...
 ```
 
 **Success Response (200)**:
+
 ```json
 {
   "user": {
@@ -525,6 +603,7 @@ Authorization: Bearer eyJhbGc...
 ```
 
 **Error Responses**:
+
 - 401: Token missing/invalid/expired
 - 403: Account deactivated
 
@@ -533,6 +612,7 @@ Authorization: Bearer eyJhbGc...
 ## ✨ UI/UX Highlights
 
 ### Visual Design
+
 1. **Gradient Backgrounds**: Subtle primary → purple
 2. **Icon System**: SVG icons cho mọi field
 3. **Color Coding**: Red (error), Blue (focus), Green (success)
@@ -541,6 +621,7 @@ Authorization: Bearer eyJhbGc...
 6. **Spacing**: 16-24px consistent gaps
 
 ### Interactions
+
 1. **Hover Effects**: Scale, shadow, color transitions
 2. **Focus States**: Ring với primary color
 3. **Loading States**: Spinner animation
@@ -548,6 +629,7 @@ Authorization: Bearer eyJhbGc...
 5. **Error Feedback**: Shake animation
 
 ### Accessibility
+
 1. **Labels**: Clear cho mọi input
 2. **Placeholders**: Helpful examples
 3. **Error Messages**: Descriptive và actionable
@@ -559,6 +641,7 @@ Authorization: Bearer eyJhbGc...
 ## 🎉 Production Checklist
 
 ### Security
+
 - [ ] Change JWT_SECRET to random string
 - [ ] Enable HTTPS
 - [ ] Add rate limiting (express-rate-limit)
@@ -569,6 +652,7 @@ Authorization: Bearer eyJhbGc...
 - [ ] 2FA (optional)
 
 ### Performance
+
 - [ ] Add Redis cho session cache
 - [ ] Implement token blacklist
 - [ ] Add CDN cho static assets
@@ -576,6 +660,7 @@ Authorization: Bearer eyJhbGc...
 - [ ] Monitor với logging service
 
 ### UX
+
 - [ ] Remember me checkbox
 - [ ] Forgot password link
 - [ ] Social login (Google, GitHub)
@@ -587,6 +672,7 @@ Authorization: Bearer eyJhbGc...
 **Status**: ✅ HOÀN THÀNH - Production Ready với Security Tốt!
 
 Hệ thống authentication đã được implement chuyên nghiệp với:
+
 - ✅ Validation đầy đủ (client + server)
 - ✅ Security best practices
 - ✅ Error handling toàn diện
