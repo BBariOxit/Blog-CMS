@@ -83,20 +83,41 @@ export const getPostBySlug = async (req, res, next) => {
   try {
     const { slug } = req.params;
 
-    const post = await Post.findOne({ slug })
-      .populate('author', 'displayName email role');
+    // Determine access level based on optional authenticated user
+    const user = req.user;
 
-    if (!post) {
-      return res.status(404).json({
-        message: 'Bài viết không tồn tại',
-      });
+    let updatedPost = null;
+
+    // Case 1: no user - only allow published posts
+    if (!user) {
+      updatedPost = await Post.findOneAndUpdate(
+        { slug, status: 'published' },
+        { $inc: { views: 1 } },
+        { new: true }
+      ).populate('author', 'displayName email role');
+    } else if (['editor', 'admin'].includes(user.role)) {
+      // Case 2: privileged users (editor/admin) can view any post
+      updatedPost = await Post.findOneAndUpdate(
+        { slug },
+        { $inc: { views: 1 } },
+        { new: true }
+      ).populate('author', 'displayName email role');
+    } else {
+      // Case 3: authenticated user (including author role) 
+      // - allow published posts OR own posts (including drafts)
+      updatedPost = await Post.findOneAndUpdate(
+        { slug, $or: [{ status: 'published' }, { author: user._id }] },
+        { $inc: { views: 1 } },
+        { new: true }
+      ).populate('author', 'displayName email role');
     }
 
-    // Tăng views
-    post.views += 1;
-    await post.save();
+    if (!updatedPost) {
+      // Not found or not allowed
+      return res.status(404).json({ message: 'Bài viết không tồn tại hoặc bạn không có quyền xem' });
+    }
 
-    res.json(post);
+    res.json(updatedPost);
   } catch (error) {
     next(error);
   }

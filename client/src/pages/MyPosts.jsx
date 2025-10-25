@@ -201,7 +201,7 @@ export default function MyPosts() {
                     </button>
 
                     <Link
-                      to={`/posts/${post.slug}`}
+                      to={`/post/${post.slug}`}
                       className="px-4 py-2 bg-slate-50 text-slate-600 rounded-lg font-medium hover:bg-slate-100 transition-colors text-center"
                     >
                       👁️ View

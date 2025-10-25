@@ -30,8 +30,16 @@ class ByVelocityStrategy {
     });
 
     // Sắp xếp theo velocity giảm dần
+    // Nếu velocity bằng nhau (±epsilon) thì ưu tiên post mới hơn (publishedAt gần đây hơn)
+    const EPS = 1e-9;
     const sorted = postsWithVelocity.sort((a, b) => {
-      return b._velocity - a._velocity;
+      const diff = b._velocity - a._velocity;
+      if (Math.abs(diff) > EPS) return diff;
+
+      const aDate = new Date(a.publishedAt || a.createdAt).getTime();
+      const bDate = new Date(b.publishedAt || b.createdAt).getTime();
+
+      return bDate - aDate; // newest first
     });
 
     return sorted.slice(0, limit);

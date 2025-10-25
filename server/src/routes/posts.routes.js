@@ -15,7 +15,7 @@ import {
   deletePost,
   getTrending,
 } from '../controllers/posts.controller.js';
-import { authenticate, requireRole } from '../middlewares/auth.js';
+import { authenticate, requireRole, optionalAuth } from '../middlewares/auth.js';
 
 const router = express.Router();
 
@@ -23,7 +23,7 @@ const router = express.Router();
 router.get('/', getPosts);
 // Get post by id (for editor) - must be before slug route
 router.get('/id/:id', getPostById);
-router.get('/:slug', getPostBySlug);
+router.get('/:slug', optionalAuth, getPostBySlug);
 router.patch('/:id/like', likePost);
 
 // Protected routes - Author+

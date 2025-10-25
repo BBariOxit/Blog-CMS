@@ -105,15 +105,31 @@ export default function PostDetail() {
                   <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">
                     {post.title}
                   </h1>
+                  {/* Draft Badge for cover image posts */}
+                  {post.status === 'draft' && (
+                    <span className="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-full text-sm font-bold border-2 border-yellow-300 shadow-lg">
+                      📝 Draft - Only visible to you
+                    </span>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Title if no cover image */}
             {!post.coverImage && (
-              <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                {post.title}
-              </h1>
+              <div>
+                <h1 className="text-5xl font-bold text-gray-900 mb-6">
+                  {post.title}
+                </h1>
+                {/* Draft Badge for non-cover posts */}
+                {post.status === 'draft' && (
+                  <div className="mb-6">
+                    <span className="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold border-2 border-yellow-300">
+                      📝 Draft - Only visible to you
+                    </span>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Author Card */}
