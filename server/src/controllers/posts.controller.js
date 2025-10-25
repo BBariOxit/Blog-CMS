@@ -413,3 +413,27 @@ export const getTrending = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Get top tags with counts (for topics navigation)
+ * GET /api/posts/tags?limit=12
+ */
+export const getTopTags = async (req, res, next) => {
+  try {
+    const limit = Math.max(1, parseInt(req.query.limit || '12'));
+
+    const agg = await Post.aggregate([
+      { $match: { status: 'published' } },
+      { $unwind: '$tags' },
+      { $group: { _id: { $toLower: '$tags' }, count: { $sum: 1 } } },
+      { $sort: { count: -1, _id: 1 } },
+      { $limit: limit },
+    ]);
+
+    const tags = agg.map((t) => ({ name: t._id, count: t.count }));
+
+    res.json({ tags });
+  } catch (error) {
+    next(error);
+  }
+};

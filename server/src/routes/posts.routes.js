@@ -14,6 +14,7 @@ import {
   likePost,
   deletePost,
   getTrending,
+  getTopTags,
 } from '../controllers/posts.controller.js';
 import { authenticate, requireRole, optionalAuth } from '../middlewares/auth.js';
 
@@ -21,6 +22,7 @@ const router = express.Router();
 
 // Public routes
 router.get('/', getPosts);
+router.get('/tags', getTopTags);
 // Get post by id (for editor) - must be before slug route
 router.get('/id/:id', getPostById);
 router.get('/:slug', optionalAuth, getPostBySlug);

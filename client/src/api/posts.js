@@ -79,6 +79,14 @@ export const postsAPI = {
   },
 
   /**
+   * Get top tags with counts
+   */
+  getTopTags: async (limit = 12) => {
+    const response = await http.get('/posts/tags', { params: { limit } });
+    return response.data;
+  },
+
+  /**
    * Get comments for a post
    */
   getComments: async (postId) => {
