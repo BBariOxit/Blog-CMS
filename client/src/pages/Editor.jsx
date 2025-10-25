@@ -184,9 +184,30 @@ How does it end?`
 
   const loadPost = async () => {
     try {
-      // Get post by ID (need to implement getPostById or use slug)
-      // For now, we'll skip edit functionality details
-      console.log('Edit mode for post:', id);
+      // Fetch post data by _id for edit mode
+      const post = await postsAPI.getPostById(id);
+
+      if (!post) {
+        setErrors({ general: 'Bài viết không tồn tại' });
+        return;
+      }
+
+      // Populate form
+      setFormData({
+        title: post.title || '',
+        contentMarkdown: post.contentMarkdown || '',
+        tags: Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || '').toString(),
+        coverImage: post.coverImage || '',
+      });
+
+      // Set cover preview (if url or data URL)
+      if (post.coverImage) {
+        setCoverImagePreview(post.coverImage);
+      } else {
+        setCoverImagePreview('');
+      }
+
+      updateCounts(post.contentMarkdown || '');
     } catch (error) {
       console.error('Failed to load post:', error);
     }

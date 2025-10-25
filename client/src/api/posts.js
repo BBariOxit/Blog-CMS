@@ -23,6 +23,14 @@ export const postsAPI = {
   },
 
   /**
+   * Get post by id (for editor)
+   */
+  getPostById: async (id) => {
+    const response = await http.get(`/posts/id/${id}`);
+    return response.data;
+  },
+
+  /**
    * Create new post
    */
   createPost: async (data) => {

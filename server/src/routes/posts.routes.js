@@ -7,6 +7,7 @@ import express from 'express';
 import {
   getPosts,
   getPostBySlug,
+  getPostById,
   createPost,
   updatePost,
   updatePostStatus,
@@ -20,6 +21,8 @@ const router = express.Router();
 
 // Public routes
 router.get('/', getPosts);
+// Get post by id (for editor) - must be before slug route
+router.get('/id/:id', getPostById);
 router.get('/:slug', getPostBySlug);
 router.patch('/:id/like', likePost);
 

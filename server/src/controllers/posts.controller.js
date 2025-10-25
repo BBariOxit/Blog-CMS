@@ -103,6 +103,27 @@ export const getPostBySlug = async (req, res, next) => {
 };
 
 /**
+ * Get post by ID (for edit) - does NOT increment views
+ * GET /api/posts/id/:id
+ */
+export const getPostById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const post = await Post.findById(id)
+      .populate('author', 'displayName email role');
+
+    if (!post) {
+      return res.status(404).json({ message: 'Bài viết không tồn tại' });
+    }
+
+    res.json(post);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Create new post (sử dụng Decorator Pattern)
  * POST /api/posts
  */
