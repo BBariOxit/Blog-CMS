@@ -17,7 +17,9 @@ export const getComments = async (req, res, next) => {
     const comments = await Comment.find({
       post: postId,
       isApproved: true,
-    }).sort({ createdAt: -1 });
+    })
+      .populate('author', 'displayName email')
+      .sort({ createdAt: -1 });
 
     res.json(comments);
   } catch (error) {
@@ -28,15 +30,17 @@ export const getComments = async (req, res, next) => {
 /**
  * Create comment
  * POST /api/posts/:postId/comments
+ * Support both authenticated and guest comments
  */
 export const createComment = async (req, res, next) => {
   try {
     const { postId } = req.params;
     const { authorName, content } = req.body;
+    const user = req.user; // From optionalAuth middleware
 
-    if (!authorName || !content) {
+    if (!content) {
       return res.status(400).json({
-        message: 'authorName và content là bắt buộc',
+        message: 'Content là bắt buộc',
       });
     }
 
@@ -48,13 +52,33 @@ export const createComment = async (req, res, next) => {
       });
     }
 
-    // Tạo comment
-    const comment = await Comment.create({
+    // Nếu user đã đăng nhập, dùng thông tin từ user
+    // Nếu không, yêu cầu authorName
+    let commentData = {
       post: postId,
-      authorName,
       content,
       isApproved: true, // Auto-approve
-    });
+    };
+
+    if (user) {
+      // Authenticated user
+      commentData.author = user._id;
+      commentData.authorName = user.displayName || user.email;
+    } else {
+      // Guest comment
+      if (!authorName) {
+        return res.status(400).json({
+          message: 'AuthorName là bắt buộc cho guest comments',
+        });
+      }
+      commentData.authorName = authorName;
+    }
+
+    // Tạo comment
+    const comment = await Comment.create(commentData);
+
+    // Populate author nếu có
+    await comment.populate('author', 'displayName email');
 
     // Tăng commentsCount của post
     post.commentsCount += 1;

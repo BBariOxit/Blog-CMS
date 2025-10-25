@@ -4,8 +4,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { postsAPI } from '../api/posts.js';
+import authStore from '../store/authStore.js';
 import Loading from '../components/Loading.jsx';
 
 // Import highlight.js theme
@@ -13,11 +14,12 @@ import 'highlight.js/styles/github-dark.css';
 
 export default function PostDetail() {
   const { slug } = useParams();
+  const [auth] = useState(authStore.getState());
+  const user = auth.user;
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [commentForm, setCommentForm] = useState({
-    authorName: '',
     content: '',
   });
 
@@ -51,14 +53,23 @@ export default function PostDetail() {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!commentForm.authorName || !commentForm.content) {
-      alert('Please fill in all fields');
+    
+    if (!commentForm.content) {
+      alert('Please enter your comment');
+      return;
+    }
+
+    // Yêu cầu đăng nhập để comment
+    if (!user) {
+      alert('Please login to comment');
       return;
     }
 
     try {
-      await postsAPI.createComment(post._id, commentForm);
-      setCommentForm({ authorName: '', content: '' });
+      await postsAPI.createComment(post._id, {
+        content: commentForm.content,
+      });
+      setCommentForm({ content: '' });
       
       // Reload comments
       const commentsData = await postsAPI.getComments(post._id);
@@ -218,48 +229,52 @@ export default function PostDetail() {
         </h2>
 
         {/* Comment Form */}
-        <form onSubmit={handleCommentSubmit} className="mb-10 bg-gradient-to-br from-gray-50 to-primary-50 p-6 rounded-xl border-2 border-primary-100">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Leave a comment</h3>
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Leave a comment</h3>
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Your Name *
-            </label>
-            <input
-              type="text"
-              value={commentForm.authorName}
-              onChange={(e) =>
-                setCommentForm({ ...commentForm, authorName: e.target.value })
-              }
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-              placeholder="John Doe"
-              required
-            />
-          </div>
+        {user ? (
+          <form onSubmit={handleCommentSubmit} className="mb-10 bg-gradient-to-br from-gray-50 to-primary-50 p-6 rounded-xl border-2 border-primary-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+              </div>
+              <div>
+                <p className="font-bold text-gray-900">{user.displayName || user.email}</p>
+                <p className="text-xs text-gray-500">Commenting as</p>
+              </div>
+            </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Comment *
-            </label>
-            <textarea
-              value={commentForm.content}
-              onChange={(e) =>
-                setCommentForm({ ...commentForm, content: e.target.value })
-              }
-              rows="4"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
-              placeholder="Share your thoughts..."
-              required
-            />
-          </div>
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Your Comment *
+              </label>
+              <textarea
+                value={commentForm.content}
+                onChange={(e) =>
+                  setCommentForm({ ...commentForm, content: e.target.value })
+                }
+                rows="4"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
+                placeholder="Share your thoughts..."
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            className="px-8 py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-bold rounded-lg hover:from-primary-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            Post Comment ✨
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="px-8 py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-bold rounded-lg hover:from-primary-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              Post Comment ✨
+            </button>
+          </form>
+        ) : (
+          <div className="mb-10 bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border-2 border-blue-100 text-center">
+            <p className="text-gray-700 mb-4">Please login to leave a comment</p>
+            <Link
+              to="/login"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-bold rounded-lg hover:from-primary-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
+            >
+              Login to Comment
+            </Link>
+          </div>
+        )}
 
         {/* Comments List */}
         <div className="space-y-4">
@@ -272,11 +287,11 @@ export default function PostDetail() {
             <div key={comment._id} className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all">
               <div className="flex items-center space-x-3 mb-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                  {comment.authorName?.charAt(0).toUpperCase()}
+                  {comment.author?.displayName?.charAt(0)?.toUpperCase() || comment.authorName?.charAt(0)?.toUpperCase()}
                 </div>
                 <div>
                   <span className="font-bold text-gray-900 block">
-                    {comment.authorName}
+                    {comment.author?.displayName || comment.authorName}
                   </span>
                   <span className="text-sm text-gray-500">
                     {new Date(comment.createdAt).toLocaleDateString('en-US', {

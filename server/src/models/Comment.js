@@ -13,6 +13,12 @@ const commentSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    // Support both authenticated and guest comments
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null, // null for guest comments
+    },
     authorName: {
       type: String,
       required: true,
