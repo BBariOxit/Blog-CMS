@@ -3,9 +3,10 @@
  * Tạo/Chỉnh sửa bài viết với preview và UX chuyên nghiệp
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { postsAPI } from '../api/posts.js';
+import { uploadsAPI } from '../api/uploads.js';
 import MarkdownPreview from '../components/MarkdownPreview.jsx';
 import authStore from '../store/authStore.js';
 
@@ -28,6 +29,10 @@ export default function Editor() {
   const [wordCount, setWordCount] = useState(0);
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const contentRef = useRef(null);
+  const imageInputRef = useRef(null);
 
   const blogTemplates = {
     tutorial: `# Tutorial Title
@@ -169,6 +174,79 @@ How does it end?`
     setCoverImageFile(null);
     setCoverImagePreview('');
     setFormData(prev => ({ ...prev, coverImage: '' }));
+  };
+
+  // Helpers to insert markdown at the current cursor
+  const insertAtCursor = (insertion) => {
+    const textarea = contentRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? formData.contentMarkdown.length;
+    const end = textarea.selectionEnd ?? formData.contentMarkdown.length;
+    const newValue = formData.contentMarkdown.slice(0, start) + insertion + formData.contentMarkdown.slice(end);
+    setFormData((prev) => ({ ...prev, contentMarkdown: newValue }));
+    updateCounts(newValue);
+    // Restore caret after insertion
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const pos = start + insertion.length;
+      textarea.setSelectionRange(pos, pos);
+    });
+  };
+
+  const handleInsertImageClick = () => {
+    if (imageInputRef.current) imageInputRef.current.click();
+  };
+
+  const handleInlineImageSelected = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadAndInsertImage(file);
+    // reset input so selecting the same file again works
+    e.target.value = '';
+  };
+
+  const uploadAndInsertImage = async (file) => {
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({ ...prev, contentMarkdown: 'Please choose an image file.' }));
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, contentMarkdown: 'Image must be under 8MB.' }));
+      return;
+    }
+    try {
+      setUploadingImage(true);
+      setUploadProgress(0);
+      const uploaded = await uploadsAPI.uploadImage(file, (evt) => {
+        if (evt.total) {
+          setUploadProgress(Math.round((evt.loaded / evt.total) * 100));
+        }
+      });
+      const alt = file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+      insertAtCursor(`\n\n![${alt}](${uploaded.url})\n\n`);
+      setErrors((prev) => ({ ...prev, contentMarkdown: '' }));
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, contentMarkdown: 'Image upload failed. Please try again.' }));
+    } finally {
+      setUploadingImage(false);
+      setUploadProgress(0);
+    }
+  };
+
+  // Paste image from clipboard support
+  const handlePaste = async (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const it of items) {
+      if (it.type && it.type.startsWith('image/')) {
+        const file = it.getAsFile();
+        if (file) {
+          e.preventDefault();
+          await uploadAndInsertImage(file);
+          break;
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -572,13 +650,63 @@ How does it end?`
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   ✍️ Content (Markdown) *
                 </label>
+                {/* Toolbar */}
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => insertAtCursor('**bold**')}
+                    className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700"
+                  >
+                    B
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertAtCursor('*italic*')}
+                    className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700"
+                  >
+                    i
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertAtCursor('\n\n# Heading\n\n')}
+                    className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700"
+                  >
+                    H1
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => insertAtCursor('`code`')}
+                    className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700"
+                  >
+                    {'</>'}
+                  </button>
+                  <div className="mx-1 h-6 w-px bg-gray-300" />
+                  <button
+                    type="button"
+                    onClick={handleInsertImageClick}
+                    className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary-600 to-purple-600 text-white text-sm font-semibold hover:from-primary-700 hover:to-purple-700"
+                    disabled={uploadingImage}
+                  >
+                    {uploadingImage ? `Uploading ${uploadProgress}%` : 'Insert Image'}
+                  </button>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleInlineImageSelected}
+                  />
+                  <span className="text-xs text-gray-500 ml-1">Tip: Paste an image from clipboard to upload</span>
+                </div>
                 <textarea
+                  ref={contentRef}
                   value={formData.contentMarkdown}
                   onChange={(e) => {
                     setFormData({ ...formData, contentMarkdown: e.target.value });
                     updateCounts(e.target.value);
                     if (errors.contentMarkdown) setErrors({ ...errors, contentMarkdown: '' });
                   }}
+                  onPaste={handlePaste}
                   rows="20"
                   className={`w-full px-4 py-3 border-2 ${
                     errors.contentMarkdown ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-primary-500'
