@@ -93,3 +93,38 @@ code.inline-code {
 .animate-slideIn {
   animation: slideIn 0.4s ease-out;
 }
+
+/* Content wrapping for long text/URLs inside rendered posts/preview */
+.post-content,
+.post-content p,
+.post-content li,
+.post-content blockquote,
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+  overflow-wrap: anywhere; /* modern, wraps long unbroken strings */
+  word-break: break-word;  /* fallback for older browsers */
+}
+
+/* Keep code blocks readable with horizontal scroll instead of forced wrapping */
+.post-content pre,
+.post-content code {
+  white-space: pre;         /* don't wrap code */
+  overflow-x: auto;         /* allow horizontal scroll when needed */
+  word-break: normal;
+}
+
+/* Ensure images and tables don't overflow the container */
+.post-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.post-content table {
+  display: block;          /* enable horizontal scroll if too wide */
+  width: 100%;
+  overflow-x: auto;
+}

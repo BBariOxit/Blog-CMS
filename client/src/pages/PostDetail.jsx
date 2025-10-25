@@ -201,7 +201,7 @@ export default function PostDetail() {
 
         {/* Post Content - HTML từ server (đã qua Decorator Pipeline) */}
         <div
-          className="prose prose-lg max-w-none bg-white rounded-xl shadow-lg p-8 mb-12
+          className="post-content prose prose-lg max-w-none bg-white rounded-xl shadow-lg p-8 mb-12
             prose-headings:font-bold prose-headings:text-gray-900
             prose-h1:text-4xl prose-h1:mb-6 prose-h1:pb-4 prose-h1:border-b prose-h1:border-gray-200
             prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-8

@@ -36,3 +36,49 @@ export async function processPostContent(post) {
   const pipeline = buildContentPipeline();
   return await pipeline.process(post);
 }
+
+/**
+ * Generate excerpt từ markdown content
+ * @param {String} markdown - Markdown content
+ * @param {Number} maxLength - Maximum length (default 200)
+ * @returns {String} - Plain text excerpt
+ */
+export function generateExcerpt(markdown, maxLength = 200) {
+  if (!markdown) return '';
+  
+  // Remove markdown syntax
+  let text = markdown
+    // Remove headers
+    .replace(/#{1,6}\s+/g, '')
+    // Remove images
+    .replace(/!\[.*?\]\(.*?\)/g, '')
+    // Remove links but keep text
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    // Remove bold/italic
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, '')
+    // Remove inline code
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove blockquotes
+    .replace(/^\s*>\s+/gm, '')
+    // Remove horizontal rules
+    .replace(/^[-*_]{3,}$/gm, '')
+    // Remove multiple spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+  
+  // Truncate to maxLength
+  if (text.length > maxLength) {
+    text = text.substring(0, maxLength);
+    // Cut at last complete word
+    const lastSpace = text.lastIndexOf(' ');
+    if (lastSpace > 0) {
+      text = text.substring(0, lastSpace);
+    }
+    text += '...';
+  }
+  
+  return text;
+}

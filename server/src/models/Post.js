@@ -44,6 +44,11 @@ const postSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    excerpt: {
+      type: String,
+      default: '',
+      maxlength: 300,
+    },
     readingTime: {
       type: Number,
       default: 1,

@@ -5,7 +5,7 @@
 
 import Post from '../models/Post.js';
 import { slugify, makeUniqueSlug } from '../utils/slugify.js';
-import { processPostContent } from '../utils/buildContent.js';
+import { processPostContent, generateExcerpt } from '../utils/buildContent.js';
 import TrendingContext from '../services/Trending/TrendingContext.js';
 import ByViewsStrategy from '../services/Trending/ByViewsStrategy.js';
 import ByVelocityStrategy from '../services/Trending/ByVelocityStrategy.js';
@@ -173,6 +173,9 @@ export const createPost = async (req, res, next) => {
       contentMarkdown,
     });
 
+    // Generate excerpt từ markdown
+    const excerpt = generateExcerpt(contentMarkdown, 200);
+
     // Tạo post
     const post = await Post.create({
       title,
@@ -181,6 +184,7 @@ export const createPost = async (req, res, next) => {
       contentMarkdown,
       contentHTML: processedContent.contentHTML,
       readingTime: processedContent.readingTime,
+      excerpt,
       tags: Array.isArray(tags) ? tags : [],
       coverImage: coverImage || '',
       status: postStatus,
@@ -243,6 +247,9 @@ export const updatePost = async (req, res, next) => {
 
       post.contentHTML = processedContent.contentHTML;
       post.readingTime = processedContent.readingTime;
+      
+      // Update excerpt
+      post.excerpt = generateExcerpt(contentMarkdown, 200);
     }
 
     // Cập nhật tags

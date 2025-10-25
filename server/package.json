@@ -8,6 +8,8 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node src/seed.js",
+    "migrate:excerpts": "node src/utils/migrateExcerpts.js",
+    "migrate:images": "node src/utils/updateCoverImages.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "keywords": ["cms", "blog", "design-patterns"],
