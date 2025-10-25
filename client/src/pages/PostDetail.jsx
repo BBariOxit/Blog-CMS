@@ -30,8 +30,8 @@ export default function PostDetail() {
   const loadPost = async () => {
     try {
       setLoading(true);
-      const postData = await postsAPI.getPostBySlug(slug);
-      setPost(postData);
+  const postData = await postsAPI.getPostBySlug(slug);
+  setPost(postData);
 
       const commentsData = await postsAPI.getComments(postData._id);
       setComments(commentsData);
@@ -155,7 +155,7 @@ export default function PostDetail() {
                       {post.author?.displayName}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                      {new Date(post.publishedAt).toLocaleDateString('vi-VN', {
                         month: 'long',
                         day: 'numeric',
                         year: 'numeric'
@@ -167,11 +167,11 @@ export default function PostDetail() {
                 <div className="flex items-center space-x-6 text-sm">
                   <span className="flex items-center space-x-2 text-gray-600">
                     <span>⏱️</span>
-                    <span className="font-medium">{post.readingTime} min read</span>
+                    <span className="font-medium">{post.readingTime} phút đọc</span>
                   </span>
                   <span className="flex items-center space-x-2 text-gray-600">
                     <span>👁️</span>
-                    <span className="font-medium">{post.views} views</span>
+                      <span className="font-medium">{post.views} lượt xem</span>
                   </span>
                   <button
                     onClick={handleLike}
@@ -219,6 +219,34 @@ export default function PostDetail() {
             prose-em:text-gray-800"
           dangerouslySetInnerHTML={{ __html: post.contentHTML }}
         />
+
+        {/* Recommendations */}
+        {post.recommendations && post.recommendations.length > 0 && (
+          <aside className="mb-12">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Bài viết liên quan</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {post.recommendations.map((rec) => (
+                <Link key={rec._id} to={`/post/${rec.slug}`} className="flex gap-4 items-center bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-md transition-all">
+                  <div className="w-28 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    {rec.coverImage ? (
+                      <img src={rec.coverImage} alt={rec.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">🖼️</div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-gray-900 truncate">{rec.title}</h4>
+                    <p className="text-sm text-gray-600 line-clamp-2">{rec.excerpt}</p>
+                    <div className="mt-1 flex items-center gap-3 text-xs text-gray-500">
+                      <span className="flex items-center gap-1"><span>👁️</span>{rec.views || 0}</span>
+                      <span className="flex items-center gap-1"><span>❤️</span>{rec.likes || 0}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </aside>
+        )}
       </article>
 
       {/* Comments Section */}
@@ -294,7 +322,7 @@ export default function PostDetail() {
                     {comment.author?.displayName || comment.authorName}
                   </span>
                   <span className="text-sm text-gray-500">
-                    {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                    {new Date(comment.createdAt).toLocaleDateString('vi-VN', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',

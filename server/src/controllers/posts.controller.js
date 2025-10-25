@@ -10,6 +10,10 @@ import TrendingContext from '../services/Trending/TrendingContext.js';
 import ByViewsStrategy from '../services/Trending/ByViewsStrategy.js';
 import ByVelocityStrategy from '../services/Trending/ByVelocityStrategy.js';
 import ByWeightedEngagementStrategy from '../services/Trending/ByWeightedEngagementStrategy.js';
+import RecommendationContext from '../services/Recommendations/RecommendationContext.js';
+import ByTagStrategy from '../services/Recommendations/ByTagStrategy.js';
+import ByAuthorStrategy from '../services/Recommendations/ByAuthorStrategy.js';
+import BySimilarityStrategy from '../services/Recommendations/BySimilarityStrategy.js';
 
 /**
  * Get all posts với filtering & pagination
@@ -117,7 +121,28 @@ export const getPostBySlug = async (req, res, next) => {
       return res.status(404).json({ message: 'Bài viết không tồn tại hoặc bạn không có quyền xem' });
     }
 
-    res.json(updatedPost);
+    // Kèm gợi ý bài viết liên quan (Strategy Pattern)
+    try {
+      const recMode = (req.query.rec || 'tags').toLowerCase();
+      let recStrategy;
+      switch (recMode) {
+        case 'author':
+          recStrategy = new ByAuthorStrategy();
+          break;
+        case 'similar':
+          recStrategy = new BySimilarityStrategy();
+          break;
+        case 'tags':
+        default:
+          recStrategy = new ByTagStrategy();
+      }
+      const recContext = new RecommendationContext(recStrategy);
+      const recommendations = await recContext.getRecommendations(updatedPost, { limit: 5 });
+      res.json({ ...updatedPost.toObject(), recommendations });
+    } catch (e) {
+      // Nếu gợi ý lỗi, vẫn trả post
+      res.json(updatedPost);
+    }
   } catch (error) {
     next(error);
   }

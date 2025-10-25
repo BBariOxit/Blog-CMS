@@ -22,449 +22,437 @@ const EXTRA_USER_DISPLAY = process.env.SEED_USER_NAME || '';
 
 const samplePosts = [
   {
-    title: 'Getting Started with React 18',
+    slug: 'getting-started-with-react-18',
+    title: 'Bắt đầu với React 18',
     coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Getting Started with React 18
+    contentMarkdown: `# Bắt đầu với React 18
 
-React 18 brings exciting new features like **concurrent rendering** and **automatic batching**.
+![React 18](https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=1600&h=900&fit=crop&q=80)
 
-## Installation
+React 18 tập trung vào trải nghiệm người dùng mượt mà hơn nhờ hai trụ cột: **Concurrent Rendering** và **Automatic Batching**. Bài viết này hướng dẫn bạn khởi động nhanh, hiểu đúng thời điểm áp dụng, kèm ví dụ thực tế và checklist triển khai.
+
+## Cài đặt nhanh
 
 \`\`\`bash
 npm install react@18 react-dom@18
 \`\`\`
 
-## Key Features
+## Những điểm nổi bật
 
-1. Automatic Batching
-2. Transitions
-3. Suspense improvements
+- Automatic Batching: gom nhiều state updates trong cùng một tick → ít re-render hơn.
+- Transitions: tách cập nhật ưu tiên thấp (ví dụ: lọc danh sách lớn) khỏi tương tác quan trọng.
+- Suspense cải tiến: sẵn sàng cho data fetching hiện đại.
+
+## useTransition trong thực tế
 
 \`\`\`javascript
 import { useState, useTransition } from 'react';
 
-function App() {
+export default function FilterList({ items }) {
   const [isPending, startTransition] = useTransition();
-  const [count, setCount] = useState(0);
-  
+  const [query, setQuery] = useState('');
+  const [filtered, setFiltered] = useState(items);
+
+  function onChange(e) {
+    const value = e.target.value;
+    setQuery(value); // cập nhật tức thì cho input
+    startTransition(() => {
+      const v = value.toLowerCase();
+      setFiltered(items.filter(x => x.toLowerCase().includes(v)));
+    });
+  }
+
   return (
-    <button onClick={() => {
-      startTransition(() => {
-        setCount(c => c + 1);
-      });
-    }}>
-      Count: {count}
-    </button>
+    <div>
+      <input placeholder="Tìm kiếm…" value={query} onChange={onChange} />
+      {isPending && <p>Đang lọc dữ liệu…</p>}
+      <ul>{filtered.map((x) => <li key={x}>{x}</li>)}</ul>
+    </div>
   );
 }
 \`\`\`
 
-Happy coding! 🚀`,
+## Checklist triển khai
+
+1. Giữ các cập nhật UI tức thì tách biệt khỏi tính toán nặng bằng transition.
+2. Dùng Suspense cho vùng content có thể tải chậm thay vì block toàn trang.
+3. Theo dõi performance bằng React Profiler, tối ưu các components hay re-render.
+
+> Mẹo: Tránh dùng transition cho các cập nhật bắt buộc đúng ngay lập tức như nhập form quan trọng hoặc xác thực.`,
     tags: ['react', 'javascript', 'frontend'],
     views: 156,
     likes: 23,
     commentsCount: 5,
   },
   {
-    title: 'MongoDB Design Patterns',
+    slug: 'mongodb-design-patterns',
+    title: 'Các mẫu thiết kế MongoDB trong dự án thực tế',
     coverImage: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# MongoDB Design Patterns
+    contentMarkdown: `# Các mẫu thiết kế MongoDB
 
-Explore essential **design patterns** for MongoDB applications.
+![MongoDB](https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1600&h=900&fit=crop&q=80)
 
-## Schema Design
+Lựa chọn giữa **Embed** (lồng tài liệu) và **Reference** (tham chiếu) ảnh hưởng lớn đến hiệu năng truy vấn, độ phức tạp cập nhật và khả năng mở rộng.
+
+## Embed vs Reference
 
 \`\`\`javascript
-// User schema with embedded address
-const userSchema = {
-  name: String,
-  email: String,
-  address: {
-    street: String,
-    city: String,
-    country: String
-  }
+// Embed: phù hợp dữ liệu nhỏ, thường đọc kèm
+const order = {
+  userId: ObjectId('...'),
+  items: [
+    { productId: 'p1', qty: 2, price: 120000 },
+    { productId: 'p2', qty: 1, price: 450000 },
+  ],
 };
+
+// Reference: khi dữ liệu lớn hoặc dùng lại ở nhiều nơi
+const post = { title: '...', author: ObjectId('userId') };
 \`\`\`
 
-## Indexing Strategy
-
-Create indexes for frequently queried fields:
+## Chỉ mục (Index) cần có
 
 \`\`\`javascript
 db.users.createIndex({ email: 1 }, { unique: true });
-db.posts.createIndex({ createdAt: -1 });
+db.posts.createIndex({ publishedAt: -1 });
+db.posts.createIndex({ tags: 1 });
 \`\`\`
 
-Performance is key! ⚡`,
+## Chiến lược nâng cấp schema
+
+- Thêm field mới dưới dạng optional để tránh downtime.
+- Ghi migration nhỏ, idempotent; chạy theo batch.
+- Dùng TTL hoặc cờ trạng thái để dọn dữ liệu tạm.
+
+> Lời khuyên: Luôn đo bằng ` + "`explain()`" + ` và profiler, không dựa trên cảm nhận.`,
     tags: ['mongodb', 'database', 'backend'],
     views: 89,
     likes: 12,
     commentsCount: 3,
   },
   {
-    title: 'Node.js Best Practices 2024',
+    slug: 'nodejs-best-practices-2025',
+    title: 'Thực hành tốt Node.js 2025',
     coverImage: 'https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Node.js Best Practices 2024
+    contentMarkdown: `# Node.js 2025
 
-Modern Node.js development requires following **best practices** for maintainable code.
+![Node.js](https://images.unsplash.com/photo-1518779578993-ec3579fee39f?w=1600&h=900&fit=crop&q=80)
 
-## Error Handling
+Mục tiêu chính là **ổn định**, **quan sát được** và **dễ bảo trì**.
+
+## Xử lý lỗi chuẩn hoá
 
 \`\`\`javascript
-// Use async/await with try-catch
-async function fetchData() {
+async function fetchData(api) {
   try {
     const data = await api.get('/data');
     return data;
-  } catch (error) {
-    logger.error('Failed to fetch:', error);
-    throw error;
+  } catch (err) {
+    logger.error('Fetch thất bại', { err, endpoint: '/data' });
+    throw err; // ném lại cho tầng trên quyết định
   }
 }
 \`\`\`
 
-## Environment Variables
-
-Never hardcode secrets! Use \`.env\`:
+## Cấu hình qua biến môi trường
 
 \`\`\`bash
-PORT=3000
-DATABASE_URL=mongodb://localhost/mydb
-JWT_SECRET=supersecret
+PORT=4000
+MONGO_URI=mongodb://localhost:27017/paperpress
+JWT_SECRET=thay_doi_ngu_mat
 \`\`\`
 
-Stay secure! 🔒`,
+## Log có ngữ cảnh
+
+Dùng Pino/Winston với requestId để truy vết end-to-end. Gộp log theo JSON để dễ phân tích.
+
+## Checklist
+
+- Bật strict mode cho mongoose schema.
+- Timeout/Retry khi gọi dịch vụ bên ngoài.
+- Đóng tài nguyên đúng cách khi tắt tiến trình.`,
     tags: ['nodejs', 'javascript', 'backend'],
     views: 234,
     likes: 45,
     commentsCount: 8,
   },
   {
-    title: 'Understanding Decorator Pattern',
+    slug: 'understanding-decorator-pattern',
+    title: 'Hiểu đúng Decorator Pattern qua ví dụ thực tế',
     coverImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Understanding Decorator Pattern
+    contentMarkdown: `# Decorator Pattern
 
-The **Decorator Pattern** allows you to add new functionality to objects dynamically.
+Decorator cho phép **mở rộng hành vi** của đối tượng bằng cách bọc (wrap) nó trong các lớp bổ sung, không cần sửa lớp gốc.
 
-## Real-World Example
+## Ví dụ đơn giản
 
 \`\`\`javascript
-class Coffee {
-  cost() { return 5; }
-}
+class Coffee { cost() { return 20000; } }
 
 class MilkDecorator {
-  constructor(coffee) {
-    this.coffee = coffee;
-  }
-  cost() {
-    return this.coffee.cost() + 2;
-  }
+  constructor(coffee) { this.coffee = coffee; }
+  cost() { return this.coffee.cost() + 5000; }
 }
 
-const myCoffee = new MilkDecorator(new Coffee());
-console.log(myCoffee.cost()); // 7
+console.log(new MilkDecorator(new Coffee()).cost()); // 25000
 \`\`\`
 
-Flexible and powerful! 💪`,
+## Ứng dụng trong hệ thống
+
+Trong PaperPress, nội dung markdown đi qua chuỗi decorators: sanitize → highlight → readingTime. Mỗi decorator đảm nhiệm một bước độc lập, giúp pipeline linh hoạt và dễ mở rộng.`,
     tags: ['design-patterns', 'javascript', 'architecture'],
     views: 67,
     likes: 15,
     commentsCount: 2,
   },
   {
-    title: 'Strategy Pattern in Action',
+    slug: 'strategy-pattern-in-action',
+    title: 'Strategy Pattern áp dụng cho tính năng Trending',
     coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Strategy Pattern in Action
+    contentMarkdown: `# Strategy Pattern cho Trending
 
-The **Strategy Pattern** defines a family of algorithms and makes them interchangeable.
+![Trending](https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&h=900&fit=crop&q=80)
 
-## Payment Example
+Tách thuật toán xếp hạng thành nhiều chiến lược: theo lượt xem, theo vận tốc, hoặc theo điểm tổng hợp.
 
 \`\`\`javascript
-class PaymentContext {
-  constructor(strategy) {
-    this.strategy = strategy;
-  }
-  
-  pay(amount) {
-    return this.strategy.pay(amount);
-  }
-}
+class ByViews { rank(ps) { return [...ps].sort((a,b)=>b.views-a.views); } }
+class ByVelocity { rank(ps) { const now=Date.now(); return [...ps].sort((a,b)=> (b.views/((now-b.publishedAt)/36e5)) - (a.views/((now-a.publishedAt)/36e5))); } }
 
-class CreditCardStrategy {
-  pay(amount) {
-    return \`Paid $\${amount} with credit card\`;
-  }
-}
-
-class PayPalStrategy {
-  pay(amount) {
-    return \`Paid $\${amount} with PayPal\`;
-  }
-}
-
-const payment = new PaymentContext(new CreditCardStrategy());
-payment.pay(100);
+class Context { constructor(strategy){ this.strategy=strategy; } getTrending(p){ return this.strategy.rank(p).slice(0,10); } }
 \`\`\`
 
-Clean and maintainable! ✨`,
+Ưu điểm: tách biệt thuật toán, mở rộng dễ, test đơn giản.`,
     tags: ['design-patterns', 'javascript', 'architecture'],
     views: 92,
     likes: 18,
     commentsCount: 4,
   },
   {
-    title: 'Express.js Middleware Deep Dive',
+    slug: 'expressjs-middleware-deep-dive',
+    title: 'Đào sâu Middleware trong Express.js',
     coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Express.js Middleware Deep Dive
+    contentMarkdown: `# Middleware Express
 
-Understanding **middleware** is crucial for Express.js mastery.
-
-## Custom Middleware
+Middleware là hàm \`(req, res, next)\`. Hãy tách rõ giữa middleware chức năng (log, auth) và middleware xử lý lỗi.
 
 \`\`\`javascript
-const logger = (req, res, next) => {
-  console.log(\`\${req.method} \${req.url}\`);
-  next();
-};
-
+const logger = (req, _res, next) => { console.log(req.method, req.url); next(); };
 app.use(logger);
-\`\`\`
 
-## Error Handling Middleware
-
-\`\`\`javascript
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: err.message });
+// Error handler (4 tham số)
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal Error' });
 });
 \`\`\`
 
-Power up your Express apps! 🔥`,
+> Thứ tự đăng ký quan trọng: logger → auth → routes → error handler.`,
     tags: ['expressjs', 'nodejs', 'backend'],
     views: 178,
     likes: 31,
     commentsCount: 6,
   },
   {
-    title: 'CSS Grid vs Flexbox',
+    slug: 'css-grid-vs-flexbox',
+    title: 'CSS Grid vs Flexbox: Dùng khi nào?',
     coverImage: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# CSS Grid vs Flexbox
+    contentMarkdown: `# Grid vs Flexbox
 
-Choose the right tool for your **layout needs**.
+![Layout](https://images.unsplash.com/photo-1526925539332-aa3b66e35444?w=1600&h=900&fit=crop&q=80)
 
-## When to use Grid
+Grid phù hợp bố cục 2 chiều; Flexbox tối ưu cho trục đơn.
 
-\`\`\`css
-.container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-\`\`\`
-
-## When to use Flexbox
+## Khi dùng Grid
 
 \`\`\`css
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 \`\`\`
 
-Master both! 🎨`,
+## Khi dùng Flexbox
+
+\`\`\`css
+.navbar { display: flex; justify-content: space-between; align-items: center; }
+\`\`\`
+
+Thực tế thường kết hợp cả hai cho layout phức tạp.`,
     tags: ['css', 'frontend', 'web-design'],
     views: 145,
     likes: 27,
     commentsCount: 7,
   },
   {
-    title: 'Async/Await Best Practices',
+    slug: 'asyncawait-best-practices',
+    title: 'Async/Await: các thực hành nên áp dụng',
     coverImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Async/Await Best Practices
+    contentMarkdown: `# Async/Await
 
-Write **clean asynchronous code** with these tips.
+Chạy song song khi có thể, luôn có timeout/bắt lỗi và hỗ trợ huỷ (abort) khi cần.
 
-## Parallel Execution
+## Chạy song song
 
 \`\`\`javascript
-// Good: Parallel
-const [users, posts] = await Promise.all([
-  fetchUsers(),
-  fetchPosts()
-]);
-
-// Bad: Sequential
-const users = await fetchUsers();
-const posts = await fetchPosts();
+const [users, posts] = await Promise.all([fetchUsers(), fetchPosts()]);
 \`\`\`
 
-## Error Handling
+## Bắt lỗi và timeout
 
 \`\`\`javascript
-try {
-  const data = await fetchData();
-  return data;
-} catch (error) {
-  console.error('Error:', error);
-  return null;
+async function withTimeout(promise, ms = 8000) {
+  const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout')), ms));
+  return Promise.race([promise, timeout]);
 }
 \`\`\`
 
-Async made easy! ⚡`,
+## Huỷ yêu cầu (AbortController)
+
+\`\`\`javascript
+const ac = new AbortController();
+setTimeout(() => ac.abort(), 3000);
+await fetch('/api', { signal: ac.signal });
+\`\`\``,
     tags: ['javascript', 'async', 'programming'],
     views: 201,
     likes: 38,
     commentsCount: 9,
   },
   {
-    title: 'TypeScript for Beginners',
+    slug: 'typescript-for-beginners',
+    title: 'TypeScript cho người mới bắt đầu',
     coverImage: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# TypeScript for Beginners
+    contentMarkdown: `# TypeScript cơ bản
 
-Learn **TypeScript** to write safer, more maintainable code.
+![TypeScript](https://images.unsplash.com/photo-1526378722484-bd91ca387e72?w=1600&h=900&fit=crop&q=80)
 
-## Basic Types
+TypeScript mang tới hệ thống kiểu tĩnh giúp giảm lỗi runtime và tăng tự tin khi refactor.
 
-\`\`\`typescript
-let name: string = 'John';
-let age: number = 30;
-let isActive: boolean = true;
+## Kiểu cơ bản và Interface
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-const user: User = {
-  id: 1,
-  name: 'John Doe',
-  email: 'john@example.com'
-};
+\`\`\`ts
+interface User { id: number; name: string; email: string; }
+const u: User = { id: 1, name: 'Minh', email: 'minh@example.com' };
 \`\`\`
 
-Type safety rocks! 🎯`,
+## Generics
+
+\`\`\`ts
+function wrap<T>(value: T) { return { value }; }
+const x = wrap<number>(42);
+\`\`\`
+
+> Lời khuyên: Bật ` + "`strict: true`" + ` trong tsconfig để tận dụng hết sức mạnh TS.`,
     tags: ['typescript', 'javascript', 'programming'],
     views: 312,
     likes: 67,
     commentsCount: 12,
   },
   {
-    title: 'Docker Containers 101',
+    slug: 'docker-containers-101',
+    title: 'Docker cơ bản dành cho lập trình viên',
     coverImage: 'https://images.unsplash.com/photo-1605745341112-85968b19335b?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Docker Containers 101
+    contentMarkdown: `# Docker cơ bản
 
-Get started with **Docker** and containerize your applications.
-
-## Dockerfile Example
-
-\`\`\`dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-\`\`\`
-
-## Docker Compose
-
-\`\`\`yaml
-version: '3.8'
-services:
-  web:
-    build: .
-    ports:
-      - "3000:3000"
-  db:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-\`\`\`
-
-Containerize everything! 🐳`,
+Đóng gói ứng dụng để môi trường dev/prod đồng nhất.`,
     tags: ['docker', 'devops', 'containers'],
     views: 187,
     likes: 42,
     commentsCount: 10,
   },
   {
-    title: 'REST API Design Principles',
+    slug: 'rest-api-design-principles',
+    title: 'Nguyên tắc thiết kế REST API',
     coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# REST API Design Principles
+    contentMarkdown: `# REST API Principles
 
-Build **clean and intuitive** REST APIs.
-
-## HTTP Methods
-
-- GET: Retrieve resources
-- POST: Create new resources
-- PUT: Update resources
-- DELETE: Remove resources
-
-\`\`\`javascript
-// Good API design
-GET    /api/users
-GET    /api/users/:id
-POST   /api/users
-PUT    /api/users/:id
-DELETE /api/users/:id
-\`\`\`
-
-## Response Codes
-
-- 200: Success
-- 201: Created
-- 400: Bad Request
-- 404: Not Found
-- 500: Server Error
-
-Design matters! 🏗️`,
+Định tuyến rõ ràng, mã phản hồi nhất quán và có tài liệu.`,
     tags: ['api', 'rest', 'backend'],
     views: 265,
     likes: 54,
     commentsCount: 15,
   },
   {
-    title: 'Git Workflow Best Practices',
+    slug: 'git-workflow-best-practices',
+    title: 'Quy trình làm việc với Git hiệu quả',
     coverImage: 'https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=1200&h=600&fit=crop&q=80',
-    contentMarkdown: `# Git Workflow Best Practices
+    contentMarkdown: `# Git workflow hiệu quả
 
-Master **Git** for better collaboration.
-
-## Branching Strategy
-
-\`\`\`bash
-# Create feature branch
-git checkout -b feature/new-feature
-
-# Make changes and commit
-git add .
-git commit -m "Add new feature"
-
-# Push to remote
-git push origin feature/new-feature
-\`\`\`
-
-## Commit Messages
-
-\`\`\`
-feat: add user authentication
-fix: resolve login bug
-docs: update README
-refactor: clean up code
-\`\`\`
-
-Good commits = good history! 📚`,
+Nhánh tính năng, pull request rõ ràng, commit có quy ước.`,
     tags: ['git', 'version-control', 'devops'],
     views: 198,
     likes: 36,
     commentsCount: 8,
+  },
+  {
+    slug: 'nextjs-15-ssr-optimizations',
+    title: 'Next.js 15: tối ưu SSR và streaming',
+    coverImage: 'https://images.unsplash.com/photo-1526378722484-bd91ca387e72?w=1200&h=600&fit=crop&q=80',
+    contentMarkdown: `# Next.js 15
+
+Tối ưu SSR với streaming và React Server Components ổn định hơn.`,
+    tags: ['nextjs', 'react', 'ssr'],
+    views: 173,
+    likes: 29,
+    commentsCount: 6,
+  },
+  {
+    slug: 'seo-cho-spa',
+    title: 'SEO cho SPA: kỹ thuật và công cụ cần biết',
+    coverImage: 'https://images.unsplash.com/photo-1529101091764-c3526daf38fe?w=1200&h=600&fit=crop&q=80',
+    contentMarkdown: `# SEO cho SPA
+
+Kết hợp SSR, sitemap và Open Graph để cải thiện hiển thị.`,
+    tags: ['seo', 'frontend', 'spa'],
+    views: 121,
+    likes: 22,
+    commentsCount: 4,
+  },
+  {
+    slug: 'winston-logging-thuc-tien',
+    title: 'Thiết kế hệ thống logging với Winston',
+    coverImage: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1200&h=600&fit=crop&q=80',
+    contentMarkdown: `# Logging với Winston
+
+Chuẩn hoá cấu trúc log và thêm requestId để truy vết.`,
+    tags: ['nodejs', 'logging', 'winston'],
+    views: 98,
+    likes: 19,
+    commentsCount: 3,
+  },
+  {
+    slug: 'bao-mat-jwt-thuc-hanh',
+    title: 'Bảo mật JWT: refresh token, rotate và blacklist',
+    coverImage: 'https://images.unsplash.com/photo-1555949963-aa79dcee981d?w=1200&h=600&fit=crop&q=80',
+    contentMarkdown: `# Bảo mật JWT
+
+Áp dụng refresh token rotation và blacklist để giảm rủi ro.`,
+    tags: ['security', 'jwt', 'auth'],
+    views: 207,
+    likes: 41,
+    commentsCount: 11,
+  },
+  {
+    slug: 'tailwind-templates-nhanh',
+    title: 'Tailwind CSS: dựng giao diện nhanh trong 30 phút',
+    coverImage: 'https://images.unsplash.com/photo-1551033406-611cf9a28f67?w=1200&h=600&fit=crop&q=80',
+    contentMarkdown: `# Tailwind nhanh gọn
+
+Tận dụng utility classes để dựng UI nhanh và đồng nhất.`,
+    tags: ['tailwind', 'css', 'frontend'],
+    views: 142,
+    likes: 24,
+    commentsCount: 5,
+  },
+  {
+    slug: 'postgres-vs-mongodb-2025',
+    title: 'Postgres vs MongoDB 2025: chọn gì cho dự án mới?',
+    coverImage: 'https://images.unsplash.com/photo-1534759846116-57968a6a2b57?w=1200&h=600&fit=crop&q=80',
+    contentMarkdown: `# Postgres vs MongoDB
+
+Chọn theo bài toán: quan hệ mạnh vs linh hoạt schema.`,
+    tags: ['database', 'postgres', 'mongodb'],
+    views: 189,
+    likes: 33,
+    commentsCount: 7,
   },
 ];
 
@@ -487,35 +475,42 @@ async function seed() {
 
     // Create users
     console.log('👤 Creating users...');
-    const authorPassword = await User.hashPassword('password');
-    const editorPassword = await User.hashPassword('password');
+  const authorPassword = await User.hashPassword('password');
+  const editorPassword = await User.hashPassword('password');
 
     // Upsert demo users instead of blindly creating
-    let author = await User.findOne({ email: 'author@example.com' });
-    if (!author) {
-      author = await User.create({
-        email: 'author@example.com',
-        passwordHash: authorPassword,
-        displayName: 'John Author',
-        role: 'author',
-        bio: 'Passionate writer and tech enthusiast. Love sharing knowledge about web development.',
-        isActive: true,
-        lastLogin: new Date(),
-      });
-    }
+    // Upsert + always refresh displayName/bio for demo accounts
+    let author = await User.findOneAndUpdate(
+      { email: 'author@example.com' },
+      {
+        $set: {
+          email: 'author@example.com',
+          passwordHash: authorPassword,
+          displayName: 'Nguyễn An',
+          role: 'author',
+          bio: 'Tác giả đam mê công nghệ, thích chia sẻ kiến thức về phát triển web và sản phẩm.',
+          isActive: true,
+          lastLogin: new Date(),
+        },
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
-    let editor = await User.findOne({ email: 'editor@example.com' });
-    if (!editor) {
-      editor = await User.create({
-        email: 'editor@example.com',
-        passwordHash: editorPassword,
-        displayName: 'Jane Editor',
-        role: 'editor',
-        bio: 'Professional editor with 5+ years of experience in technical writing and content management.',
-        isActive: true,
-        lastLogin: new Date(),
-      });
-    }
+    let editor = await User.findOneAndUpdate(
+      { email: 'editor@example.com' },
+      {
+        $set: {
+          email: 'editor@example.com',
+          passwordHash: editorPassword,
+          displayName: 'Trần Bình',
+          role: 'editor',
+          bio: 'Biên tập viên với 5+ năm kinh nghiệm, yêu thích nội dung kỹ thuật rõ ràng và dễ hiểu.',
+          isActive: true,
+          lastLogin: new Date(),
+        },
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
     // Optionally add one extra custom user (e.g., your personal email) if provided
     if (EXTRA_USER_EMAIL && EXTRA_USER_DISPLAY) {
@@ -557,13 +552,13 @@ async function seed() {
       const excerpt = generateExcerpt(samplePost.contentMarkdown, 200);
 
       // Upsert post by slug to avoid duplicates and preserve custom data
-      const slug = slugify(samplePost.title);
+      const desiredSlug = samplePost.slug ? samplePost.slug : slugify(samplePost.title);
       const post = await Post.findOneAndUpdate(
-        { slug },
+        { slug: desiredSlug },
         {
           $set: {
             title: samplePost.title,
-            slug,
+            slug: desiredSlug,
             author: i % 2 === 0 ? author._id : editor._id,
             contentMarkdown: samplePost.contentMarkdown,
             contentHTML: processed.contentHTML,
@@ -592,18 +587,18 @@ async function seed() {
     let totalComments = 0;
     if (SEED_RESET) {
       console.log('💬 Creating comments...');
-      const commentAuthors = ['Alice', 'Bob', 'Charlie', 'David', 'Emma'];
+      const commentAuthors = ['Lan', 'Minh', 'Tú', 'Hà', 'Phúc', 'Thảo', 'Hưng'];
       const commentTexts = [
-        'Great article! Very helpful.',
-        'Thanks for sharing this.',
-        'Excellent explanation!',
-        'This helped me a lot.',
-        'Keep up the good work!',
-        'Very informative post.',
-        'Love the examples.',
-        'Clear and concise.',
-        'Looking forward to more content.',
-        'Bookmarked for later!',
+        'Bài viết rất hay và dễ hiểu.',
+        'Cảm ơn bạn đã chia sẻ.',
+        'Giải thích cực kỳ rõ ràng!',
+        'Mình đã áp dụng thành công theo hướng dẫn.',
+        'Tiếp tục phát huy nhé!',
+        'Nội dung hữu ích cho người mới.',
+        'Rất thích các ví dụ minh hoạ.',
+        'Ngắn gọn, súc tích.',
+        'Mong chờ thêm nhiều bài viết tương tự.',
+        'Đã lưu lại để đọc sau!',
       ];
 
       for (const post of createdPosts) {
@@ -636,9 +631,9 @@ async function seed() {
   console.log(`   Users: at least 2 (preserved + demo upserts)`);
     console.log(`   Posts: ${createdPosts.length} (${createdPosts.filter(p => p.status === 'published').length} published)`);
     console.log(`   Comments: ${totalComments}\n`);
-    console.log('🔑 Test Accounts:');
-    console.log('   Author: author@example.com / password');
-    console.log('   Editor: editor@example.com / password');
+  console.log('🔑 Tài khoản demo:');
+  console.log('   Tác giả: author@example.com / password');
+  console.log('   Biên tập: editor@example.com / password');
     console.log('═══════════════════════════════════════════════════\n');
 
     await mongoClient.disconnect();

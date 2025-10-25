@@ -6,7 +6,7 @@
 import { Link } from 'react-router-dom';
 
 export default function PostCard({ post }) {
-  const formattedDate = new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', {
+  const formattedDate = new Date(post.publishedAt || post.createdAt).toLocaleDateString('vi-VN', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
@@ -42,7 +42,7 @@ export default function PostCard({ post }) {
           <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg z-10">
             <span className="text-xs font-bold text-gray-700 flex items-center gap-1">
               <span>⏱️</span>
-              <span>{post.readingTime} min</span>
+              <span>{post.readingTime} phút</span>
             </span>
           </div>
         )}
