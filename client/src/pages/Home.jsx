@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { postsAPI } from '../api/posts.js';
 import PostList from '../components/PostList.jsx';
 import Loading from '../components/Loading.jsx';
@@ -148,7 +149,40 @@ export default function Home() {
                 ) : searchResults.length === 0 ? (
                   <p className="text-gray-500">No results for "{searchQuery}"</p>
                 ) : (
-                  <PostList posts={searchResults} />
+                  <div className="space-y-3">
+                    {searchResults.map((post) => (
+                      <Link
+                        to={`/post/${post.slug}`}
+                        key={post._id}
+                        className="flex gap-4 rounded-xl border border-gray-200 hover:border-blue-300 bg-white p-3 shadow-sm hover:shadow-md transition-all"
+                      >
+                        <div className="flex-shrink-0 w-40 h-24 rounded-lg overflow-hidden bg-gray-100">
+                          {post.coverImage ? (
+                            <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">🖼️</div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap gap-2 mb-1">
+                            {(post.tags || []).slice(0, 2).map((t) => (
+                              <span key={t} className="px-2 py-0.5 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full border border-blue-200">#{t}</span>
+                            ))}
+                            {post.tags?.length > 2 && (
+                              <span className="px-2 py-0.5 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full">+{post.tags.length - 2}</span>
+                            )}
+                          </div>
+                          <h5 className="text-base font-bold text-gray-900 mb-1 truncate">{post.title}</h5>
+                          <p className="text-sm text-gray-600 line-clamp-3">{post.excerpt}</p>
+                          <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                            <span className="flex items-center gap-1"><span>⏱️</span>{post.readingTime || 1} min</span>
+                            <span className="flex items-center gap-1"><span>👁️</span>{post.views || 0}</span>
+                            <span className="flex items-center gap-1"><span>❤️</span>{post.likes || 0}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
