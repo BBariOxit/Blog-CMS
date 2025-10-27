@@ -371,6 +371,34 @@ Ensure you have the following installed:
 - **npm** >= 9.0.0 (comes with Node.js)
 - **Docker** (Optional, recommended) ([Download](https://www.docker.com/))
 
+### 🚀 One-Click Setup & Run (Windows)
+
+**The easiest way to run PaperPress CMS!** Just double-click one file:
+
+```bash
+# Simply double-click this file, or run in terminal:
+run.bat
+```
+
+**What it does automatically:**
+1. ✅ Checks Node.js installation
+2. ✅ Creates environment configuration files (.env)
+3. ✅ Installs all dependencies (server + client)
+4. ✅ Starts MongoDB with Docker (if available)
+5. ✅ Optionally seeds database with sample data
+6. ✅ Starts backend server (http://localhost:4000)
+7. ✅ Starts frontend client (http://localhost:5173)
+8. ✅ Opens application in your browser
+
+**That's it!** Everything is automated in one file. No manual setup needed! 🎉
+
+**To stop all services:**
+```bash
+stop.bat
+```
+
+---
+
 ### Installation
 
 #### Option 1: Docker (Recommended)
