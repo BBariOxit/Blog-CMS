@@ -374,7 +374,7 @@ export default function Home() {
             const Chip = ({ t }) => (
               <button
                 key={t.name}
-                onClick={() => setSelectedTag(t.name)}
+                onClick={() => setSelectedTag(selectedTag === t.name ? '' : t.name)}
                 className={`group flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 border ${selectedTag === t.name
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 hover:from-blue-700 hover:to-indigo-700'
                     : 'bg-gradient-to-r from-gray-50 to-white text-gray-700 border-gray-200 hover:border-blue-300 hover:text-blue-700 hover:shadow-md'}
