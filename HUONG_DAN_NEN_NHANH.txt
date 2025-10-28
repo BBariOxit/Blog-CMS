@@ -1,0 +1,179 @@
+# ═══════════════════════════════════════════════════════
+#  HƯỚNG DẪN NÉN FILE SOURCE SIÊU NHẸ (DƯỚI 5MB)
+# ═══════════════════════════════════════════════════════
+
+## ❌ VẤN ĐỀ: File nén 33MB vì còn node_modules
+
+File bạn nén có 33MB là vì WinRAR vẫn đang nén cả:
+- server/node_modules/     (~15-20MB)
+- client/node_modules/     (~10-15MB)
+- .git/                    (~2-5MB)
+
+## ✅ GIẢI PHÁP: 3 CÁCH NÉN ĐÚNG
+
+---
+
+### 📦 CÁCH 1: Dùng Script Tự Động (Khuyên dùng nhất)
+
+```cmd
+# Chạy file này:
+zip-clean.bat
+```
+
+Script sẽ tự động:
+✅ Loại trừ node_modules
+✅ Loại trừ .git, dist, build, uploads
+✅ Loại trừ .env, *.log
+✅ Tạo file Blog-CMS-Source-Clean.zip (~3-5MB)
+
+---
+
+### 🔧 CÁCH 2: Cấu hình WinRAR Thủ Công (Chi tiết)
+
+**Bước 1:** Click phải vào thư mục Blog-CMS → "Add to archive..."
+
+**Bước 2:** Trong tab "Files":
+
+```
+Files to exclude (gõ chính xác):
+node_modules;.git;dist;build;uploads;.env;*.log;*.db_seeded;package-lock.json
+```
+
+**Lưu ý quan trọng:**
+- Gõ CHÍNH XÁC: node_modules (KHÔNG có dấu cách)
+- Dùng dấu ; để ngăn cách
+- KHÔNG có dấu * trước node_modules
+
+**Bước 3:** Click OK để nén
+
+**Kết quả:** File ~3-5MB thay vì 33MB
+
+---
+
+### 🎯 CÁCH 3: Tạo Thư Mục Mới Chỉ Chứa Source (Chắc chắn nhất)
+
+```powershell
+# Chạy trong PowerShell:
+
+# 1. Tạo thư mục mới
+New-Item -Path "Blog-CMS-Source" -ItemType Directory -Force
+
+# 2. Copy chỉ những file cần thiết
+Copy-Item "server/src" "Blog-CMS-Source/server/src" -Recurse
+Copy-Item "server/package.json" "Blog-CMS-Source/server/"
+Copy-Item "server/Dockerfile" "Blog-CMS-Source/server/"
+Copy-Item "server/jest.config.json" "Blog-CMS-Source/server/"
+
+Copy-Item "client/src" "Blog-CMS-Source/client/src" -Recurse
+Copy-Item "client/public" "Blog-CMS-Source/client/public" -Recurse
+Copy-Item "client/index.html" "Blog-CMS-Source/client/"
+Copy-Item "client/package.json" "Blog-CMS-Source/client/"
+Copy-Item "client/vite.config.js" "Blog-CMS-Source/client/"
+Copy-Item "client/tailwind.config.js" "Blog-CMS-Source/client/"
+Copy-Item "client/postcss.config.js" "Blog-CMS-Source/client/"
+
+Copy-Item "Database" "Blog-CMS-Source/Database" -Recurse
+Copy-Item "README.md" "Blog-CMS-Source/"
+Copy-Item "docker-compose.yml" "Blog-CMS-Source/"
+Copy-Item "run.bat" "Blog-CMS-Source/"
+Copy-Item "stop.bat" "Blog-CMS-Source/"
+Copy-Item ".gitignore" "Blog-CMS-Source/"
+
+# 3. Nén thư mục mới
+Compress-Archive -Path "Blog-CMS-Source" -DestinationPath "Blog-CMS-Source-Clean.zip" -CompressionLevel Optimal -Force
+
+# 4. Xóa thư mục tạm
+Remove-Item "Blog-CMS-Source" -Recurse -Force
+```
+
+---
+
+### 📊 KẾT QUẢ MONG MUỐN
+
+```
+✅ Blog-CMS-Source-Clean.zip
+   Kích thước: 3-5 MB (thay vì 33MB)
+   
+Chứa:
+✅ server/src/          (source code)
+✅ client/src/          (source code)
+✅ Database/            (schema + docs)
+✅ package.json         (cả 2 thư mục)
+✅ README.md            (tài liệu)
+✅ run.bat, stop.bat    (scripts)
+✅ docker-compose.yml   (config)
+
+KHÔNG chứa:
+❌ node_modules/        (RẤT NẶNG)
+❌ .git/                (không cần)
+❌ .env                 (bảo mật)
+❌ uploads/             (user data)
+❌ package-lock.json    (auto-generated)
+```
+
+---
+
+### 🚀 CÁCH 4: Upload lên GitHub (Nộp bằng link)
+
+Nếu file vẫn quá nặng, bạn có thể:
+
+1. Push code lên GitHub (đã có repo rồi)
+2. Tạo file TXT chứa link GitHub
+3. Nộp file TXT thay vì file zip
+
+**File: GITHUB_LINK.txt**
+```
+DỰ ÁN: Blog CMS - PaperPress
+GITHUB: https://github.com/BBariOxit/Blog-CMS
+
+HƯỚNG DẪN CHẠY:
+1. git clone https://github.com/BBariOxit/Blog-CMS.git
+2. cd Blog-CMS
+3. run.bat
+
+LOGIN:
+Email: author@example.com
+Password: password
+```
+
+---
+
+### 💡 KHUYẾN NGHỊ
+
+**Nên dùng CÁCH 1** (zip-clean.bat) vì:
+✅ Tự động, không sai sót
+✅ File nhẹ nhất (~3-5MB)
+✅ Nhanh chóng
+
+**Hoặc CÁCH 2** nếu quen WinRAR:
+✅ Có kiểm soát nhiều hơn
+✅ Giao diện trực quan
+
+**Hoặc CÁCH 4** nếu giáo viên chấp nhận GitHub:
+✅ Không giới hạn dung lượng
+✅ Version control
+✅ Professional hơn
+
+---
+
+### 🐛 TROUBLESHOOTING
+
+**Vấn đề:** File vẫn nặng sau khi nén
+**Giải pháp:** 
+- Giải nén file ra kiểm tra
+- Nếu vẫn thấy node_modules → Nén lại theo CÁCH 3
+
+**Vấn đề:** WinRAR không loại trừ được
+**Giải pháp:**
+- Dùng CÁCH 3 (tạo thư mục mới)
+- Hoặc xóa thủ công node_modules trước khi nén
+
+**Vấn đề:** Giáo viên không chấp nhận link GitHub
+**Giải pháp:**
+- Bắt buộc phải dùng CÁCH 3
+- Đảm bảo không copy node_modules
+
+---
+
+**Ngày tạo:** 27/10/2025
+**File này:** HUONG_DAN_NEN_NHANH.txt

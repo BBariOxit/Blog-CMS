@@ -11,6 +11,7 @@
 ## 📋 Collections (Bảng)
 
 ### 1. **users** - Người dùng
+
 ```javascript
 {
   _id: ObjectId,
@@ -24,10 +25,12 @@
 ```
 
 **Indexes:**
+
 - email: unique index
 - role: index
 
 ### 2. **posts** - Bài viết
+
 ```javascript
 {
   _id: ObjectId,
@@ -50,6 +53,7 @@
 ```
 
 **Indexes:**
+
 - slug: unique index
 - author: index
 - status: index
@@ -58,6 +62,7 @@
 - views: descending index (for trending)
 
 ### 3. **comments** - Bình luận
+
 ```javascript
 {
   _id: ObjectId,
@@ -70,6 +75,7 @@
 ```
 
 **Indexes:**
+
 - post: index
 - createdAt: descending index
 
@@ -80,6 +86,7 @@
 ### **seed.js** - Khởi tạo dữ liệu mẫu
 
 **Chức năng:**
+
 - Xóa toàn bộ dữ liệu cũ (nếu có)
 - Tạo 2 users mẫu:
   - Author: `author@example.com` / `password`
@@ -88,6 +95,7 @@
 - Tạo comments ngẫu nhiên cho các bài viết
 
 **Cách chạy:**
+
 ```bash
 cd server
 npm run seed
@@ -103,6 +111,7 @@ posts (1) ----< (N) comments
 ```
 
 **Giải thích:**
+
 - 1 user có thể có nhiều posts (1-N)
 - 1 post có thể có nhiều comments (1-N)
 
@@ -111,10 +120,12 @@ posts (1) ----< (N) comments
 ## 🔐 Bảo mật
 
 ### Password Hashing
+
 - Sử dụng **bcrypt** với salt rounds = 10
 - Password không bao giờ lưu dưới dạng plain text
 
 ### Authentication
+
 - JWT (JSON Web Token) với expire time: 7 ngày
 - Token được gửi qua HTTP Header: `Authorization: Bearer <token>`
 
@@ -128,6 +139,7 @@ posts (1) ----< (N) comments
 2. **updateCoverImages.js** - Cập nhật cover images cho posts
 
 **Cách chạy:**
+
 ```bash
 cd server
 npm run migrate:excerpts
@@ -139,6 +151,7 @@ npm run migrate:images
 ## 📊 Sample Data Statistics
 
 Sau khi chạy seed.js:
+
 - ✅ 2 Users
 - ✅ 8 Posts (6 published, 2 drafts)
 - ✅ ~10-20 Comments (random)
@@ -158,15 +171,20 @@ Sau khi chạy seed.js:
 ## 🛠️ Troubleshooting
 
 ### Lỗi kết nối MongoDB:
+
 ```
 MongooseServerSelectionError: connect ECONNREFUSED
 ```
+
 **Giải pháp:**
+
 - Kiểm tra MongoDB đang chạy: `mongod --version`
 - Hoặc start MongoDB với Docker: `docker-compose up -d mongodb`
 
 ### Seed script thất bại:
+
 **Giải pháp:**
+
 - Đảm bảo MongoDB đang chạy
 - Kiểm tra connection string trong `.env`
 - Xóa database cũ: `mongo paperpress --eval "db.dropDatabase()"`

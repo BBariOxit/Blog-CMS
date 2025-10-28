@@ -381,6 +381,7 @@ run.bat
 ```
 
 **What it does automatically:**
+
 1. ✅ Checks Node.js installation
 2. ✅ Creates environment configuration files (.env)
 3. ✅ Installs all dependencies (server + client)
@@ -393,6 +394,7 @@ run.bat
 **That's it!** Everything is automated in one file. No manual setup needed! 🎉
 
 **To stop all services:**
+
 ```bash
 stop.bat
 ```
